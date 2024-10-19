@@ -19,7 +19,7 @@ def add():
     if request.method == 'POST':
         dato1 = request.form['input1']
         cursor =  mysqldb.connection.cursor()
-        cursor.execute('')
+        cursor.execute('9NSERT INTO SOMETABLE (dato1) VALUES (%s)',(dato1,))
         return 'recieved'
 
 if __name__ == '__main__':
