@@ -6,6 +6,35 @@
     <title>Document</title>
 </head>
 <body>
-    
+    {% with messages = get_flash_messages() %}
+    {% if messages %}
+    {% for messages in messages %}
+    <p>{{ messages }}</p>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <form action="add_record" method="post">
+        <input type="text" name="nombres" id="names">
+        <input type="text" name="apellidos" id="lastnames">
+        <input type="number" name="edad" id="age">
+        <button type="submit">ENVIAR</button>
+    </form>
+    <table>
+        <thead>
+            <tr>
+                <td>Id</td>
+                <td>nombres</td>
+                <td>apellidos</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>
+                    {{user.id}}
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </body>
 </html>
