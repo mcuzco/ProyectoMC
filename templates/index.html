@@ -1,14 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-     <form action="/add_record" method="post">
-        <input type="text" name="input1" id="1"><br>
-        <button type="submit">ENVIAR</button>
-    </form>
-</body>
-</html>
+{% extends 'layout.html' %}
+    {% block body %}
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form action="add_record" method="post">
+            <input type="text" name="nombres" id="names">
+            <input type="text" name="apellidos" id="lastnames">
+            <input type="number" name="edad" id="age">
+            <button type="submit">ENVIAR</button>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <td>Id</td>
+                    <td>nombres</td>
+                    <td>apellidos</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>
+                        {{user.0}}
+                    </td>
+                    <td>
+                        {{user.1}}
+                    </td>
+                    <td>
+                        {{user.2}}
+                    </td>
+                    <td>
+                        <a href="/editar/{{user.0}}">Editar</a>
+                        <a href="/eliminar/{{user.0}}">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endblock %}

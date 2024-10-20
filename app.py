@@ -30,7 +30,34 @@ def add():
         cursor.execute('INSERT INTO TABLE1 (nombres,apellidos,edad) VALUES (%s,%s,%s)',(names,lastnames,ages))
         mysqldb.connection.commit()
         flash('User added Succesfully')
-        return redirect(url_for('index.html'))
+        return redirect(url_for('Index'))
+
+@app.route('/eliminar/<string:id>')
+def delete(id):
+    cursor3 = mysqldb.connection.cursor()
+    cursor3.execute('DELETE FROM TABLE1 WHERE id = {0}'.format(id))
+    mysqldb.connection.commit()
+    flash('User Deleted')
+    return redirect(url_for('Index'))
+
+@app.route('/editar/<string:id>')
+def edit(id):
+    cursor4 = mysqldb.connection.cursor()
+    cursor4.execute('SELECT * FROM TABLE1 WHERE id = {0}'.format(id))
+    data1 = cursor4.fetchall()
+    return render_template('edit_user.html', usersedit = data1)
+
+@app.route('/update/<id>')
+def uopdateInfo(id):
+    if request.method == 'POST':
+        cursor5 = mysqldb.connection.cursor()
+        nuevo_nombres = request.form['new_name']
+        nuevo_apellidos = request.form['new_lastname']
+        nuevo_edad = request.form['new_age']
+        cursor5.execute('UPDATE TABLE1 SET nombres = %s, apellidos = %s, edad = %s WHERE id = %s', (nuevo_nombres,nuevo_apellidos,nuevo_edad,id))
+        mysqldb.connection.commit()
+        data1 = cursor5.fetchall()
+    return redirect(url_for('Index'))
 
 if __name__ == '__main__':
     app.run(port=3000, debug=True)
