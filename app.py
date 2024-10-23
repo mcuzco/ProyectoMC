@@ -2,11 +2,11 @@ from flask import Flask, flash, redirect, render_template, request, url_for
 from flask_mysqldb import MySQL
 app = Flask(__name__)
 
+# Mysql Connection
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'Rafael2002'
 app.config['MYSQL_DB'] = 'proyecto'
-
 mysqldb = MySQL(app)
 
 #setting
@@ -48,7 +48,7 @@ def edit(id):
     return render_template('edit_user.html', useredit = data1)
 
 @app.route('/update/<id>' , methods=['POST'])
-def uopdateInfo(id):
+def updateInfo(id):
     if request.method == 'POST':
         cursor5 = mysqldb.connection.cursor()
 
