@@ -4,8 +4,8 @@ app = Flask(__name__)
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Mami270802'
-app.config['MYSQL_DB'] = 'MCPROJECT'
+app.config['MYSQL_PASSWORD'] = 'Rafael2002'
+app.config['MYSQL_DB'] = 'proyecto'
 
 mysqldb = MySQL(app)
 
@@ -45,18 +45,21 @@ def edit(id):
     cursor4 = mysqldb.connection.cursor()
     cursor4.execute('SELECT * FROM TABLE1 WHERE id = {0}'.format(id))
     data1 = cursor4.fetchall()
-    return render_template('edit_user.html', usersedit = data1)
+    return render_template('edit_user.html', useredit = data1)
 
-@app.route('/update/<id>')
+@app.route('/update/<id>' , methods=['POST'])
 def uopdateInfo(id):
     if request.method == 'POST':
         cursor5 = mysqldb.connection.cursor()
+
         nuevo_nombres = request.form['new_name']
         nuevo_apellidos = request.form['new_lastname']
         nuevo_edad = request.form['new_age']
-        cursor5.execute('UPDATE TABLE1 SET nombres = %s, apellidos = %s, edad = %s WHERE id = %s', (nuevo_nombres,nuevo_apellidos,nuevo_edad,id))
+
+        cursor5.execute('UPDATE TABLE1 SET nombres = %s, apellidos = %s, edad = %s WHERE id = %s', (nuevo_nombres,nuevo_apellidos,nuevo_edad, id))
         mysqldb.connection.commit()
-        data1 = cursor5.fetchall()
+        flash('User updated successfully')
+        # data1 = cursor5.fetchall()
     return redirect(url_for('Index'))
 
 if __name__ == '__main__':

@@ -1,9 +1,9 @@
-{% extends 'layout.html' %}
-    {% block body %}
-        <form action="/update/{{useredit.0}}" method="post">
-            <input type="text" name="new_name" id="nuevonombre" value="{{useredit.1}}">
-            <input type="text" name="new_lastname" id="nuevoapellido" value="{{useredit.2}}">
-            <input type="number" name="new_age" id="nuevoedad" value="{{useredit.3}}">
-            <button type="submit">GUARDAR</button>
-        </form>
-    {% endblock %}
+{% extends 'layout/layout.html' %}
+{% block body %}
+    <form action="/update/{{ useredit[0][0] }}" method="post">
+        <input type="text" name="new_name" id="nuevonombre" value="{{ useredit[0][1] }}">
+        <input type="text" name="new_lastname" id="nuevoapellido" value="{{ useredit[0][2] }}">
+        <input type="number" name="new_age" id="nuevoedad" value="{{ useredit[0][3] }}">
+        <button type="submit">GUARDAR</button>
+    </form>
+{% endblock %}
