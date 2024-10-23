@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block body %}
-<h2>Editar Cliente</h2>
+<h2 style="color: blanchedalmond;">Editar Cliente</h2>
 <form action="{{ url_for('update_cliente', id=cliente.id) }}" method="post">
     <input type="text" name="nombre" value="{{ cliente.nombre }}" placeholder="Nombre" required>
     <input type="email" name="email" value="{{ cliente.email }}" placeholder="Email" required>
