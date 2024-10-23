@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<h2>Editar Reserva</h2>
+<form action="{{ url_for('update_reserva', id=reserva.id) }}" method="post">
+    <input type="text" name="cliente_id" value="{{ reserva.cliente_id }}" placeholder="Cliente ID" required>
+    <input type="date" name="fecha_inicio" value="{{ reserva.fecha_inicio }}" placeholder="Fecha Inicio" required>
+    <input type="date" name="fecha_fin" value="{{ reserva.fecha_fin }}" placeholder="Fecha Fin" required>
+    <label for="servicios">Servicios:</label>
+    <select name="servicios" multiple>
+        {% for servicio in servicios %}
+        <option value="{{ servicio.id }}" {% if servicio.id in detalles %}selected{% endif %}>{{ servicio.nombre }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Actualizar Reserva</button>
+</form>
+<a href="{{ url_for('index') }}">Volver</a>
+{% endblock %}
