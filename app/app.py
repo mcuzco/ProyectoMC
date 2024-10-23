@@ -203,10 +203,16 @@ def update_servicio(id):
 
 @app.route('/delete_servicio/<string:id>')
 def delete_servicio(id):
-    cursor = mysqldb.connection.cursor()
-    cursor.execute('DELETE FROM servicios WHERE id = %s', (id,))
-    mysqldb.connection.commit()
-    flash('Servicio/Habitación eliminado exitosamente!')
+    try:
+        cursor = mysqldb.connection.cursor()
+        # Eliminar registros asociados en detalle_reservas
+        cursor.execute('DELETE FROM detalle_reservas WHERE servicio_id = %s', (id,))
+        # Eliminar el servicio
+        cursor.execute('DELETE FROM servicios WHERE id = %s', (id,))
+        mysqldb.connection.commit()
+        flash('Servicio/Habitación eliminado exitosamente!')
+    except Exception as e:
+        flash(f'Error al eliminar servicio: {str(e)}')
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
