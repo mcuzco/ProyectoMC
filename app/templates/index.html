@@ -74,9 +74,19 @@
         <div class="form-group">
           <input type="date" class="form-control" name="fecha_fin" placeholder="Fecha Fin" required>
         </div>
+
+        <!-- Seleccinar Servicio -->
         <div class="form-group">
-          <input type="text" class="form-control" name="servicios" placeholder="Servicios (comma separated)" required>
+          <label for="servicios" class="form-label">Servicios:</label>
+          <div class="select">
+            <select name="servicios" class="form-control form-control-lg" multiple>
+              {% for servicio in servicios %}
+              <option value="{{ servicio.nombre }}">{{ servicio.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
         </div>
+
         <button class="btn btn-primary btn-block">
           Save Reserva
         </button>

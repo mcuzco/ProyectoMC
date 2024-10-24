@@ -9,7 +9,7 @@ app.config['SECRET_KEY'] = 'matthews'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'MAtt1233xd'
+app.config['MYSQL_PASSWORD'] = 'Rafael2002'
 app.config['MYSQL_DB'] = 'flaskcontact'
 app.config['MYSQL_SSL_DISABLED'] = True  # Deshabilitar SSL
 
@@ -98,16 +98,19 @@ def add_reserva():
         cliente_id = request.form['cliente_id']
         fecha_inicio = request.form['fecha_inicio']
         fecha_fin = request.form['fecha_fin']
+        servicios = request.form.getlist('servicios')
         
-        # Verificar que el cliente_id existe en la tabla clientes
+        # Verificar que al menos un servicio ha sido seleccionado
+        if not servicios:
+            flash('Error: Debes seleccionar al menos un servicio.')
+            return redirect(url_for('index'))
+        
         cursor = mysqldb.connection.cursor()
         cursor.execute('SELECT * FROM clientes WHERE id = %s', (cliente_id,))
         cliente = cursor.fetchone()
-        
         if cliente:
             cursor.execute('INSERT INTO reservas (cliente_id, fecha_inicio, fecha_fin) VALUES (%s, %s, %s)', (cliente_id, fecha_inicio, fecha_fin))
             reserva_id = cursor.lastrowid
-            servicios = request.form.getlist('servicios')
             for servicio_nombre in servicios:
                 cursor.execute('SELECT id FROM servicios WHERE nombre = %s', (servicio_nombre,))
                 servicio = cursor.fetchone()
@@ -119,6 +122,7 @@ def add_reserva():
             flash('Error: Cliente no encontrado.')
         
         return redirect(url_for('index'))
+
 
 @app.route('/edit_reserva/<id>', methods=['POST', 'GET'])
 def get_reserva(id):

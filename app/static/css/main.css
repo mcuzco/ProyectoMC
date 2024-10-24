@@ -1,6 +1,29 @@
 body {
-  background: #8E2DE2;  /* fallback for old browsers */
-  background: -webkit-linear-gradient(to right, #4A00E0, #8E2DE2);  /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to right, #4A00E0, #8E2DE2); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: #8E2DE2;
+  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #4A00E0, #8E2DE2);
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #4A00E0, #8E2DE2);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
 }
+
+.select {
+  margin-bottom: 20px;
+}
+
+.select select {
+  width: 60%;
+  padding: 10px;
+  border: 2px solid #8d959e;
+  border-radius: 6px;
+  font-size: 16px;
+  background-color: #f8f9fa;
+  transition: border-color 0.3s ease;
+  appearance: none;
+}
+
+.select select option:hover {
+  background-color: #e9ecef;
+}
+
