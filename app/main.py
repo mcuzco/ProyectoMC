@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_mysqldb import MySQL
-import os
 
 app = Flask(__name__)
 
@@ -15,25 +14,6 @@ app.config['MYSQL_SSL_DISABLED'] = True  # Deshabilitar SSL
 
 mysqldb = MySQL(app)
 
-@app.route('/')
-def index():
-    cursor = mysqldb.connection.cursor()
-    
-    # Fetch all clients
-    cursor.execute('SELECT * FROM clientes')
-    clientes = cursor.fetchall()
-    
-    # Fetch all reservations
-    cursor.execute('SELECT * FROM reservas')
-    reservas = cursor.fetchall()
-    
-    # Fetch all services
-    cursor.execute('SELECT * FROM servicios')
-    servicios = cursor.fetchall()
-    
-    return render_template('index.html', clientes=clientes, reservas=reservas, servicios=servicios)
-
-# CRUD de Clientes
 @app.route('/')
 def index():
     cursor = mysqldb.connection.cursor()
@@ -100,6 +80,7 @@ def update_cliente(id):
 def delete_cliente(id):
     try:
         cursor = mysqldb.connection.cursor()
+        cursor.execute('DELETE FROM reservas WHERE cliente_id = %s', (id,))
         cursor.execute('DELETE FROM clientes WHERE id = %s', (id,))
         mysqldb.connection.commit()
         flash('Cliente eliminado exitosamente!')
@@ -201,13 +182,17 @@ def update_servicio(id):
         mysqldb.connection.commit()
         flash('Servicio/Habitación actualizado exitosamente!')
         return redirect(url_for('index'))
-
 @app.route('/delete_servicio/<string:id>')
 def delete_servicio(id):
-    cursor = mysqldb.connection.cursor()
-    cursor.execute('DELETE FROM servicios WHERE id = {0}'.format(id))
-    mysqldb.connection.commit()
-    flash('Servicio/Habitación eliminado exitosamente!')
+    try:
+        cursor = mysqldb.connection.cursor()
+        cursor.execute('DELETE FROM detalle_reservas WHERE servicio_id = %s', (id,))
+        cursor.execute('DELETE FROM servicios WHERE id = %s', (id,))
+        mysqldb.connection.commit()
+        flash('Servicio/Habitación eliminado exitosamente!')
+    except Exception as e:
+        flash(f'Error al eliminar servicio: {str(e)}')
+    return redirect(url_for('index'))
     return redirect(url_for('index'))
 
 if __name__ == '__main__':

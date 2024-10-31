@@ -18,13 +18,13 @@
     <div class="card card-body">
       <form action="{{ url_for('add_cliente') }}" method="POST">
         <div class="form-group">
-          <input type="text" class="form-control" name="nombre" placeholder="Nombre">
+          <input type="text" class="form-control" name="nombre" placeholder="Nombre" required>
         </div>
         <div class="form-group">
-          <input type="text" class="form-control" name="email" placeholder="Email">
+          <input type="email" class="form-control" name="email" placeholder="Email" required>
         </div>
         <div class="form-group">
-          <input type="text" class="form-control" name="telefono" placeholder="Teléfono">
+          <input type="text" class="form-control" name="telefono" placeholder="Teléfono" required>
         </div>
         <button class="btn btn-primary btn-block">
           Save Cliente
@@ -51,8 +51,8 @@
           <td>{{ cliente.email }}</td>
           <td>{{ cliente.telefono }}</td>
           <td>
-            <a href="/edit_cliente/{{ cliente.id }}" class="btn btn-secondary">edit</a>
-            <a href="/delete_cliente/{{ cliente.id }}" class="btn btn-danger btn-delete">delete</a>
+            <a href="{{ url_for('get_cliente', id=cliente.id) }}" class="btn btn-secondary">edit</a>
+            <a href="{{ url_for('delete_cliente', id=cliente.id) }}" class="btn btn-danger btn-delete">delete</a>
           </td>
         </tr>
         {% endfor %}
@@ -66,16 +66,16 @@
     <div class="card card-body">
       <form action="{{ url_for('add_reserva') }}" method="POST">
         <div class="form-group">
-          <input type="text" class="form-control" name="cliente_id" placeholder="Cliente ID">
+          <input type="text" class="form-control" name="cliente_id" placeholder="Cliente ID" required>
         </div>
         <div class="form-group">
-          <input type="date" class="form-control" name="fecha_inicio" placeholder="Fecha Inicio">
+          <input type="date" class="form-control" name="fecha_inicio" placeholder="Fecha Inicio" required>
         </div>
         <div class="form-group">
-          <input type="date" class="form-control" name="fecha_fin" placeholder="Fecha Fin">
+          <input type="date" class="form-control" name="fecha_fin" placeholder="Fecha Fin" required>
         </div>
         <div class="form-group">
-          <input type="text" class="form-control" name="servicios" placeholder="Servicios (comma separated)">
+          <input type="text" class="form-control" name="servicios" placeholder="Servicios (comma separated)" required>
         </div>
         <button class="btn btn-primary btn-block">
           Save Reserva
@@ -102,8 +102,8 @@
           <td>{{ reserva.fecha_inicio }}</td>
           <td>{{ reserva.fecha_fin }}</td>
           <td>
-            <a href="/edit_reserva/{{ reserva.id }}" class="btn btn-secondary">edit</a>
-            <a href="/delete_reserva/{{ reserva.id }}" class="btn btn-danger btn-delete">delete</a>
+            <a href="{{ url_for('get_reserva', id=reserva.id) }}" class="btn btn-secondary">edit</a>
+            <a href="{{ url_for('delete_reserva', id=reserva.id) }}" class="btn btn-danger btn-delete">delete</a>
           </td>
         </tr>
         {% endfor %}
@@ -120,10 +120,10 @@
           <input type="text" class="form-control" name="nombre" placeholder="Nombre del Servicio">
         </div>
         <div class="form-group">
-          <input type="text" class="form-control" name="descripcion" placeholder="Descripción">
+          <input type="text" class="form-control" name="descripcion" placeholder="Descripción" required>
         </div>
         <div class="form-group">
-          <input type="text" class="form-control" name="precio" placeholder="Precio">
+          <input type="number" class="form-control" name="precio" placeholder="Precio" required>
         </div>
         <button class="btn btn-primary btn-block">
           Save Servicio
@@ -150,8 +150,8 @@
           <td>{{ servicio.descripcion }}</td>
           <td>{{ servicio.precio }}</td>
           <td>
-            <a href="/edit_servicio/{{ servicio.id }}" class="btn btn-secondary">edit</a>
-            <a href="/delete_servicio/{{ servicio.id }}" class="btn btn-danger btn-delete">delete</a>
+            <a href="{{ url_for('get_servicio', id=servicio.id) }}" class="btn btn-secondary">edit</a>
+            <a href="{{ url_for('delete_servicio', id=servicio.id) }}" class="btn btn-danger btn-delete">delete</a>
           </td>
         </tr>
         {% endfor %}
