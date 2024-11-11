@@ -13,7 +13,7 @@ CREATE TABLE reservas (
     cliente_id INT NOT NULL,
     fecha_inicio DATE NOT NULL,
     fecha_fin DATE NOT NULL,
-    FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE servicios (
@@ -27,7 +27,30 @@ CREATE TABLE detalle_reservas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     reserva_id INT NOT NULL,
     servicio_id INT NOT NULL,
-    FOREIGN KEY (reserva_id) REFERENCES reservas(id),
-    FOREIGN KEY (servicio_id) REFERENCES servicios(id)
+    FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (servicio_id) REFERENCES servicios(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+ALTER TABLE reservas
+DROP FOREIGN KEY reservas_ibfk_1;
+
+ALTER TABLE reservas
+ADD CONSTRAINT reservas_ibfk_1
+FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
+
+ALTER TABLE detalle_reservas
+DROP FOREIGN KEY detalle_reservas_ibfk_1;
+ALTER TABLE detalle_reservas
+DROP FOREIGN KEY detalle_reservas_ibfk_2;
+
+ALTER TABLE detalle_reservas
+ADD CONSTRAINT detalle_reservas_ibfk_1
+FOREIGN KEY (reserva_id) REFERENCES reservas(id)
+ON DELETE CASCADE
+ON UPDATE CASCADE,
+ADD CONSTRAINT detalle_reservas_ibfk_2
+FOREIGN KEY (servicio_id) REFERENCES servicios(id)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
