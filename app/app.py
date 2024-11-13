@@ -14,37 +14,28 @@ app.config['MYSQL_DB'] = 'flaskcontact'
 app.config['MYSQL_SSL_DISABLED'] = True  # Deshabilitar SSL
 
 mysqldb = MySQL(app)
-
+# home
 @app.route('/')
-def index():
-    cursor = mysqldb.connection.cursor()
-    
+def home():
     # Fetch all clients
+    return render_template('home.html')
+
+@app.route('/clientes')
+def clientes():
+    cursor = mysqldb.connection.cursor()
     cursor.execute('SELECT * FROM clientes')
     clientes = cursor.fetchall()
-    
-    # Fetch all reservations with client names and services
-    cursor.execute('''
-        SELECT reservas.id, clientes.nombre AS cliente_nombre, reservas.fecha_inicio, reservas.fecha_fin
-        FROM reservas
-        JOIN clientes ON reservas.cliente_id = clientes.id
-    ''')
-    reservas = cursor.fetchall()
-    
-    for reserva in reservas:
-        cursor.execute('''
-            SELECT servicios.nombre
-            FROM detalle_reservas
-            JOIN servicios ON detalle_reservas.servicio_id = servicios.id
-            WHERE detalle_reservas.reserva_id = %s
-        ''', (reserva['id'],))
-        reserva['servicios'] = cursor.fetchall()
+    return render_template('clientes/clientes.html',clientes=clientes)
+
+@app.route('/another_URL')
+def index():
+    cursor = mysqldb.connection.cursor()
     
     # Fetch all services
     cursor.execute('SELECT * FROM servicios')
     servicios = cursor.fetchall()
     
-    return render_template('index.html', clientes=clientes, reservas=reservas, servicios=servicios)
+    return render_template('index.html', reservas=reservas, servicios=servicios)
 
 # CRUD de Clientes
 @app.route('/add_cliente', methods=['POST'])
@@ -60,15 +51,15 @@ def add_cliente():
             flash('Cliente agregado exitosamente!')
         except Exception as e:
             flash(f'Error al agregar cliente: {str(e)}')
-        return redirect(url_for('index'))
-
+        return redirect(url_for('clientes'))
+#EDITS CLIENT (GET)
 @app.route('/edit_cliente/<id>', methods=['POST', 'GET'])
 def get_cliente(id):
     cursor = mysqldb.connection.cursor()
     cursor.execute('SELECT * FROM clientes WHERE id = %s', (id,))
     cliente = cursor.fetchone()
-    return render_template('edit-cliente.html', cliente=cliente)
-
+    return render_template('clientes/edit-cliente.html', cliente=cliente)
+#(POST)
 @app.route('/update_cliente/<id>', methods=['POST'])
 def update_cliente(id):
     if request.method == 'POST':
@@ -88,7 +79,7 @@ def update_cliente(id):
             flash('Cliente actualizado exitosamente!')
         except Exception as e:
             flash(f'Error al actualizar cliente: {str(e)}')
-        return redirect(url_for('index'))
+        return redirect(url_for('clientes'))
 
 @app.route('/delete_cliente/<string:id>', methods=['POST'])
 def delete_cliente(id):
@@ -103,11 +94,32 @@ def delete_cliente(id):
         flash('Cliente y sus reservas asociadas eliminados exitosamente!')
     except Exception as e:
         flash(f'Error al eliminar cliente: {str(e)}')
-    return redirect(url_for('index'))
+    return redirect(url_for('clientes'))
 
 # CRUD de Reservas
-@app.route('/add_reserva', methods=['POST'])
-def add_reserva():
+@app.route('/reservas')
+def reservas():
+    cursor = mysqldb.connection.cursor()
+    # Fetch all reservations with client names and services
+    cursor.execute('''
+        SELECT reservas.id, clientes.nombre AS cliente_nombre, reservas.fecha_inicio, reservas.fecha_fin
+        FROM reservas
+        JOIN clientes ON reservas.cliente_id = clientes.id
+    ''')
+    reservas = cursor.fetchall()
+    
+    for reserva in reservas:
+        cursor.execute('''
+            SELECT servicios.nombre
+            FROM detalle_reservas
+            JOIN servicios ON detalle_reservas.servicio_id = servicios.id
+            WHERE detalle_reservas.reserva_id = %s
+        ''', (reserva['id'],))
+        reserva['servicios'] = cursor.fetchall()
+    return render_template('reservas/reservas.html')
+    
+@app.route('/add_reservas', methods=['POST'])
+def add_reservas():
     if request.method == 'POST':
         cliente_id = request.form['cliente_id']
         fecha_inicio = request.form['fecha_inicio']
@@ -132,8 +144,8 @@ def add_reserva():
         else:
             flash('Error: Cliente no encontrado.')
         
-        return redirect(url_for('index'))
-
+        return redirect(url_for('reservas'))
+#EDITA RESERVA
 @app.route('/edit_reserva/<id>', methods=['POST', 'GET'])
 def get_reserva(id):
     cursor = mysqldb.connection.cursor()
@@ -155,7 +167,7 @@ def get_reserva(id):
     ''', (id,))
     detalles = [row['servicio_id'] for row in cursor.fetchall()]
     
-    return render_template('edit-reserva.html', reserva=reserva, servicios=servicios, detalles=detalles)
+    return render_template('reservas/reservas.html', reserva=reserva, servicios=servicios, detalles=detalles)
 
 @app.route('/update_reserva/<id>', methods=['POST'])
 def update_reserva(id):

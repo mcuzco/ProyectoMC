@@ -1,0 +1,85 @@
+<!-- Reservas Section -->
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="row mt-4">
+    <div class="col-md-5">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">Agregar Reserva</h5>
+        </div>
+        <div class="card-body">
+          <form action="{{ url_for('add_reservas') }}" method="POST">
+            <div class="mb-3">
+              <label for="cliente_id" class="form-label">Cliente ID</label>
+              <input type="text" class="form-control" id="cliente_id" name="cliente_id" placeholder="Cliente ID" required>
+            </div>
+            <div class="mb-3">
+              <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+              <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+            </div>
+            <div class="mb-3">
+              <label for="fecha_fin" class="form-label">Fecha Fin</label>
+              <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+            </div>
+            <div class="mb-3">
+              <label for="servicios" class="form-label">Servicios</label>
+              <select name="servicios" id="servicios" class="form-control" multiple>
+                {% for servicio in servicios %}
+                <option value="{{ servicio.nombre }}">{{ servicio.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button class="btn btn-primary w-100">Guardar Reserva</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-7">
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="card-title mb-0">Lista de Reservas</h5>
+        </div>
+        <div class="card-body">
+          <table class="table table-striped table-hover table-bordered table-sm bg-white">
+            <thead class="table-dark">
+              <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Fecha Inicio</th>
+                <th>Fecha Fin</th>
+                <th>Servicios</th>
+                <th>Operaciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for reserva in reservas %}
+              <tr>
+                <td>{{ reserva.id }}</td>
+                <td>{{ reserva.cliente_nombre }}</td>
+                <td>{{ reserva.fecha_inicio }}</td>
+                <td>{{ reserva.fecha_fin }}</td>
+                <td>
+                  {% for servicio in reserva.servicios %}
+                  <span class="badge bg-secondary">{{ servicio.nombre }}</span>
+                  {% endfor %}
+                </td>
+                <td>
+                  <a href="{{ url_for('get_reserva', id=reserva.id) }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-edit"></i> Editar
+                  </a>
+                  <form action="{{ url_for('delete_reserva', id=reserva.id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete(this);">
+                    <button type="submit" class="btn btn-danger btn-sm">
+                      <i class="fas fa-trash-alt"></i> Eliminar
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
