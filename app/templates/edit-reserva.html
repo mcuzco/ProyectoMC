@@ -3,16 +3,27 @@
 {% block body %}
 <h2>Editar Reserva</h2>
 <form action="{{ url_for('update_reserva', id=reserva.id) }}" method="post">
-    <input type="text" name="cliente_id" value="{{ reserva.cliente_id }}" placeholder="Cliente ID" required>
-    <input type="date" name="fecha_inicio" value="{{ reserva.fecha_inicio }}" placeholder="Fecha Inicio" required>
-    <input type="date" name="fecha_fin" value="{{ reserva.fecha_fin }}" placeholder="Fecha Fin" required>
-    <label for="servicios">Servicios:</label>
-    <select name="servicios" multiple>
-        {% for servicio in servicios %}
-        <option value="{{ servicio.id }}" {% if servicio.id in detalles %}selected{% endif %}>{{ servicio.nombre }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit">Actualizar Reserva</button>
+    <div class="mb-3">
+        <label for="cliente_nombre" class="form-label">Cliente</label>
+        <input type="text" class="form-control" id="cliente_nombre" name="cliente_nombre" value="{{ reserva.cliente_nombre }}" readonly>
+    </div>
+    <div class="mb-3">
+        <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ reserva.fecha_inicio }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="fecha_fin" class="form-label">Fecha Fin</label>
+        <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ reserva.fecha_fin }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="servicios" class="form-label">Servicios</label>
+        <select name="servicios" id="servicios" class="form-control" multiple>
+            {% for servicio in servicios %}
+            <option value="{{ servicio.nombre }}" {% if servicio.nombre in reserva.servicios %}selected{% endif %}>{{ servicio.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Actualizar Reserva</button>
 </form>
-<a href="{{ url_for('index') }}">Volver</a>
+<a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Volver</a>
 {% endblock %}

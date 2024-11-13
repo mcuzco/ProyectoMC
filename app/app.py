@@ -23,9 +23,22 @@ def index():
     cursor.execute('SELECT * FROM clientes')
     clientes = cursor.fetchall()
     
-    # Fetch all reservations
-    cursor.execute('SELECT * FROM reservas')
+    # Fetch all reservations with client names and services
+    cursor.execute('''
+        SELECT reservas.id, clientes.nombre AS cliente_nombre, reservas.fecha_inicio, reservas.fecha_fin
+        FROM reservas
+        JOIN clientes ON reservas.cliente_id = clientes.id
+    ''')
     reservas = cursor.fetchall()
+    
+    for reserva in reservas:
+        cursor.execute('''
+            SELECT servicios.nombre
+            FROM detalle_reservas
+            JOIN servicios ON detalle_reservas.servicio_id = servicios.id
+            WHERE detalle_reservas.reserva_id = %s
+        ''', (reserva['id'],))
+        reserva['servicios'] = cursor.fetchall()
     
     # Fetch all services
     cursor.execute('SELECT * FROM servicios')
@@ -77,16 +90,17 @@ def update_cliente(id):
             flash(f'Error al actualizar cliente: {str(e)}')
         return redirect(url_for('index'))
 
-@app.route('/delete_cliente/<string:id>')
+@app.route('/delete_cliente/<string:id>', methods=['POST'])
 def delete_cliente(id):
     try:
         cursor = mysqldb.connection.cursor()
         # Eliminar reservas asociadas al cliente
+        cursor.execute('DELETE FROM detalle_reservas WHERE reserva_id IN (SELECT id FROM reservas WHERE cliente_id = %s)', (id,))
         cursor.execute('DELETE FROM reservas WHERE cliente_id = %s', (id,))
         # Eliminar el cliente
         cursor.execute('DELETE FROM clientes WHERE id = %s', (id,))
         mysqldb.connection.commit()
-        flash('Cliente eliminado exitosamente!')
+        flash('Cliente y sus reservas asociadas eliminados exitosamente!')
     except Exception as e:
         flash(f'Error al eliminar cliente: {str(e)}')
     return redirect(url_for('index'))
@@ -98,19 +112,16 @@ def add_reserva():
         cliente_id = request.form['cliente_id']
         fecha_inicio = request.form['fecha_inicio']
         fecha_fin = request.form['fecha_fin']
-        servicios = request.form.getlist('servicios')
         
-        # Verificar que al menos un servicio ha sido seleccionado
-        if not servicios:
-            flash('Error: Debes seleccionar al menos un servicio.')
-            return redirect(url_for('index'))
-        
+        # Verificar que el cliente_id existe en la tabla clientes
         cursor = mysqldb.connection.cursor()
         cursor.execute('SELECT * FROM clientes WHERE id = %s', (cliente_id,))
         cliente = cursor.fetchone()
+        
         if cliente:
             cursor.execute('INSERT INTO reservas (cliente_id, fecha_inicio, fecha_fin) VALUES (%s, %s, %s)', (cliente_id, fecha_inicio, fecha_fin))
             reserva_id = cursor.lastrowid
+            servicios = request.form.getlist('servicios')
             for servicio_nombre in servicios:
                 cursor.execute('SELECT id FROM servicios WHERE nombre = %s', (servicio_nombre,))
                 servicio = cursor.fetchone()
@@ -123,30 +134,41 @@ def add_reserva():
         
         return redirect(url_for('index'))
 
-
 @app.route('/edit_reserva/<id>', methods=['POST', 'GET'])
 def get_reserva(id):
     cursor = mysqldb.connection.cursor()
-    cursor.execute('SELECT * FROM reservas WHERE id = %s', (id,))
+    cursor.execute('''
+        SELECT reservas.id, reservas.cliente_id, clientes.nombre AS cliente_nombre, reservas.fecha_inicio, reservas.fecha_fin
+        FROM reservas
+        JOIN clientes ON reservas.cliente_id = clientes.id
+        WHERE reservas.id = %s
+    ''', (id,))
     reserva = cursor.fetchone()
-    cursor.execute('SELECT * FROM detalle_reservas WHERE reserva_id = %s', (id,))
-    detalles = cursor.fetchall()
-    return render_template('edit-reserva.html', reserva=reserva, detalles=detalles)
+    
+    cursor.execute('SELECT * FROM servicios')
+    servicios = cursor.fetchall()
+    
+    cursor.execute('''
+        SELECT servicio_id
+        FROM detalle_reservas
+        WHERE reserva_id = %s
+    ''', (id,))
+    detalles = [row['servicio_id'] for row in cursor.fetchall()]
+    
+    return render_template('edit-reserva.html', reserva=reserva, servicios=servicios, detalles=detalles)
 
 @app.route('/update_reserva/<id>', methods=['POST'])
 def update_reserva(id):
     if request.method == 'POST':
-        cliente_id = request.form['cliente_id']
         fecha_inicio = request.form['fecha_inicio']
         fecha_fin = request.form['fecha_fin']
         cursor = mysqldb.connection.cursor()
         cursor.execute("""
             UPDATE reservas
-            SET cliente_id = %s,
-                fecha_inicio = %s,
+            SET fecha_inicio = %s,
                 fecha_fin = %s
             WHERE id = %s
-        """, (cliente_id, fecha_inicio, fecha_fin, id))
+        """, (fecha_inicio, fecha_fin, id))
         cursor.execute('DELETE FROM detalle_reservas WHERE reserva_id = %s', (id,))
         servicios = request.form.getlist('servicios')
         for servicio_nombre in servicios:
@@ -158,13 +180,16 @@ def update_reserva(id):
         flash('Reserva actualizada exitosamente!')
         return redirect(url_for('index'))
 
-@app.route('/delete_reserva/<string:id>')
+@app.route('/delete_reserva/<string:id>', methods=['POST'])
 def delete_reserva(id):
-    cursor = mysqldb.connection.cursor()
-    cursor.execute('DELETE FROM reservas WHERE id = %s', (id,))
-    cursor.execute('DELETE FROM detalle_reservas WHERE reserva_id = %s', (id,))
-    mysqldb.connection.commit()
-    flash('Reserva eliminada exitosamente!')
+    try:
+        cursor = mysqldb.connection.cursor()
+        cursor.execute('DELETE FROM detalle_reservas WHERE reserva_id = %s', (id,))
+        cursor.execute('DELETE FROM reservas WHERE id = %s', (id,))
+        mysqldb.connection.commit()
+        flash('Reserva eliminada exitosamente!')
+    except Exception as e:
+        flash(f'Error al eliminar reserva: {str(e)}')
     return redirect(url_for('index'))
 
 # CRUD de Habitaciones/Servicios
@@ -205,7 +230,7 @@ def update_servicio(id):
         flash('Servicio/Habitación actualizado exitosamente!')
         return redirect(url_for('index'))
 
-@app.route('/delete_servicio/<string:id>')
+@app.route('/delete_servicio/<string:id>', methods=['POST'])
 def delete_servicio(id):
     try:
         cursor = mysqldb.connection.cursor()
