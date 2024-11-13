@@ -19,11 +19,12 @@
 
 <body>
     <!-- NAVIGATION  -->
-    <nav class="navbar navbar-dark bg-dark">
+    <nav class="navbar navbar-dark bg-dark" style="margin-bottom: 30px;">
         <div class="container">
             <a class="navbar-brand" href="/">Flask App</a>
         </div>
     </nav>
+
     <div class="container pt-4">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -35,11 +36,13 @@
         {% block body %}
         {% endblock %}
     </div>
+
     <!-- Footer -->
-    <footer class="footer mt-auto py-3 bg-dark">
-        <div class="container">
+    <footer class="footer mt-auto py-3 bg-dark" style="margin-top: 10px;">
+        <div class="container" style="margin-top: 15px;">
             <span class="text-muted">© 2024 Flask App</span>
         </div>
+
     </footer>
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

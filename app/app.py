@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_mysqldb import MySQL
+
 import os
 
 app = Flask(__name__)
@@ -15,7 +16,33 @@ app.config['MYSQL_SSL_DISABLED'] = True  # Deshabilitar SSL
 
 mysqldb = MySQL(app)
 
-@app.route('/')
+# Simulación de base de datos de usuarios
+
+# Ruta para el login
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        username = request.form['username']
+        password = request.form['password']
+        cursor = mysqldb.connection.cursor()
+        # Buscar al usuario en la base de datos
+        cursor.execute('SELECT * FROM usuarios WHERE username = %s', (username,))
+        user = cursor.fetchone()
+        # Verificar si las credenciales son correctas
+        if user and user['password'] == password:
+            # Si el usuario y la contraseña son correctos, guardar el id del usuario en la sesión
+            session['user_id'] = user['id']
+            flash('Login exitoso!', 'success')
+            return redirect(url_for('index'))  # Redirigir a la página de dashboard o principal
+        else: 
+            flash('Usuario o contraseña incorrectos', 'danger')
+    return render_template('login.html')  # Mostrar formulario de login
+
+    
+    
+###################################################################################
+@app.route('/index')
 def index():
     cursor = mysqldb.connection.cursor()
     

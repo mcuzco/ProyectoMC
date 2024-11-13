@@ -27,3 +27,17 @@ body {
   background-color: #e9ecef;
 }
 
+html, body {
+  height: 100%;  /* Asegura que el cuerpo y el HTML ocupen el 100% de la altura de la ventana */
+  margin: 0;     /* Elimina márgenes por defecto */
+  display: flex; /* Usar Flexbox */
+  flex-direction: column; /* Organiza los elementos de arriba hacia abajo */
+}
+
+.container {
+  flex: 1; /* Hace que el contenido ocupe el espacio disponible y empuje el footer hacia abajo */
+}
+
+.footer {
+  margin-top: auto; /* Asegura que el footer se coloque siempre al final */
+}
