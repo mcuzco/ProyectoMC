@@ -4,8 +4,16 @@
 <h2>Editar Reserva</h2>
 <form action="{{ url_for('update_reserva', id=reserva.id) }}" method="post">
     <div class="mb-3">
-        <label for="cliente_nombre" class="form-label">Cliente</label>
-        <input type="text" class="form-control" id="cliente_nombre" name="cliente_nombre" value="{{ reserva.cliente_nombre }}" readonly>
+        <label for="clientes" class="form-label">Clientes</label>
+              <select name="cliente_id" id="clientes" class="form-control" required>
+              {% if clientes %}
+                {% for cliente in clientes %}
+                <option selected value="{{ cliente.id }}">{{ cliente.nombre }}</option>
+                {% endfor %}
+              {% else %}
+              <option disabled>Sin clientes a quien asignar :/</option>
+              {% endif %}
+              </select>
     </div>
     <div class="mb-3">
         <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
@@ -17,13 +25,13 @@
     </div>
     <div class="mb-3">
         <label for="servicios" class="form-label">Servicios</label>
-        <select name="servicios" id="servicios" class="form-control" multiple>
+        <select name="servicios" id="servicios" class="form-control" multiple required>
             {% for servicio in servicios %}
-            <option value="{{ servicio.nombre }}" {% if servicio.nombre in reserva.servicios %}selected{% endif %}>{{ servicio.nombre }}</option>
+            <option selected value="{{ servicio.nombre }}" {% if servicio.nombre in reserva.servicios %}selected{% endif %}>{{ servicio.nombre }}</option>
             {% endfor %}
         </select>
     </div>
     <button type="submit" class="btn btn-primary">Actualizar Reserva</button>
 </form>
-<a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Volver</a>
+<a href="{{ url_for('reservas') }}" class="btn btn-secondary mt-3">Volver</a>
 {% endblock %}

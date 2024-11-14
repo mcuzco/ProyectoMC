@@ -27,16 +27,6 @@ def clientes():
     clientes = cursor.fetchall()
     return render_template('clientes/clientes.html',clientes=clientes)
 
-@app.route('/another_URL')
-def index():
-    cursor = mysqldb.connection.cursor()
-    
-    # Fetch all services
-    cursor.execute('SELECT * FROM servicios')
-    servicios = cursor.fetchall()
-    
-    return render_template('index.html', reservas=reservas, servicios=servicios)
-
 # CRUD de Clientes
 @app.route('/add_cliente', methods=['POST'])
 def add_cliente():
@@ -107,7 +97,7 @@ def reservas():
         JOIN clientes ON reservas.cliente_id = clientes.id
     ''')
     reservas = cursor.fetchall()
-    
+    #fetch all the services
     for reserva in reservas:
         cursor.execute('''
             SELECT servicios.nombre
@@ -116,7 +106,14 @@ def reservas():
             WHERE detalle_reservas.reserva_id = %s
         ''', (reserva['id'],))
         reserva['servicios'] = cursor.fetchall()
-    return render_template('reservas/reservas.html')
+
+    cursor.execute('SELECT id, nombre FROM servicios')
+    servicios = cursor.fetchall()
+    
+    cursor.execute('SELECT id, nombre FROM clientes')
+    clientes = cursor.fetchall()
+
+    return render_template('reservas/reservas.html', servicios = servicios ,reservas = reservas, clientes = clientes)
     
 @app.route('/add_reservas', methods=['POST'])
 def add_reservas():
@@ -156,6 +153,9 @@ def get_reserva(id):
         WHERE reservas.id = %s
     ''', (id,))
     reserva = cursor.fetchone()
+
+    cursor.execute('SELECT id,nombre FROM clientes')
+    clientes = cursor.fetchall()
     
     cursor.execute('SELECT * FROM servicios')
     servicios = cursor.fetchall()
@@ -167,20 +167,22 @@ def get_reserva(id):
     ''', (id,))
     detalles = [row['servicio_id'] for row in cursor.fetchall()]
     
-    return render_template('reservas/reservas.html', reserva=reserva, servicios=servicios, detalles=detalles)
+    return render_template('reservas/edit-reserva.html', reserva=reserva, servicios=servicios, detalles=detalles, clientes = clientes)
 
 @app.route('/update_reserva/<id>', methods=['POST'])
 def update_reserva(id):
     if request.method == 'POST':
+        id_cliente = request.form['cliente_id']
         fecha_inicio = request.form['fecha_inicio']
         fecha_fin = request.form['fecha_fin']
         cursor = mysqldb.connection.cursor()
         cursor.execute("""
             UPDATE reservas
-            SET fecha_inicio = %s,
+            SET cliente_id = %s,
+                fecha_inicio = %s,
                 fecha_fin = %s
             WHERE id = %s
-        """, (fecha_inicio, fecha_fin, id))
+        """, (id_cliente,fecha_inicio, fecha_fin, id))
         cursor.execute('DELETE FROM detalle_reservas WHERE reserva_id = %s', (id,))
         servicios = request.form.getlist('servicios')
         for servicio_nombre in servicios:
@@ -190,7 +192,7 @@ def update_reserva(id):
                 cursor.execute('INSERT INTO detalle_reservas (reserva_id, servicio_id) VALUES (%s, %s)', (id, servicio['id']))
         mysqldb.connection.commit()
         flash('Reserva actualizada exitosamente!')
-        return redirect(url_for('index'))
+        return redirect(url_for('reservas'))
 
 @app.route('/delete_reserva/<string:id>', methods=['POST'])
 def delete_reserva(id):
@@ -202,9 +204,18 @@ def delete_reserva(id):
         flash('Reserva eliminada exitosamente!')
     except Exception as e:
         flash(f'Error al eliminar reserva: {str(e)}')
-    return redirect(url_for('index'))
+    return redirect(url_for('reservas'))
 
 # CRUD de Habitaciones/Servicios
+@app.route('/servicios')
+def servicios():
+    cursor = mysqldb.connection.cursor()
+    
+    # Fetch all services
+    cursor.execute('SELECT * FROM servicios')
+    servicios = cursor.fetchall()
+    
+    return render_template('servicios/servicios.html', servicios = servicios)
 @app.route('/add_servicio', methods=['POST'])
 def add_servicio():
     if request.method == 'POST':
@@ -215,14 +226,14 @@ def add_servicio():
         cursor.execute('INSERT INTO servicios (nombre, descripcion, precio) VALUES (%s, %s, %s)', (nombre, descripcion, precio))
         mysqldb.connection.commit()
         flash('Servicio/Habitación agregado exitosamente!')
-        return redirect(url_for('index'))
+        return redirect(url_for('servicios'))
 
 @app.route('/edit_servicio/<id>', methods=['POST', 'GET'])
 def get_servicio(id):
     cursor = mysqldb.connection.cursor()
     cursor.execute('SELECT * FROM servicios WHERE id = %s', (id,))
     servicio = cursor.fetchone()
-    return render_template('edit-servicio.html', servicio=servicio)
+    return render_template('servicios/edit-servicio.html', servicio=servicio)
 
 @app.route('/update_servicio/<id>', methods=['POST'])
 def update_servicio(id):
@@ -240,7 +251,7 @@ def update_servicio(id):
         """, (nombre, descripcion, precio, id))
         mysqldb.connection.commit()
         flash('Servicio/Habitación actualizado exitosamente!')
-        return redirect(url_for('index'))
+        return redirect(url_for('servicios'))
 
 @app.route('/delete_servicio/<string:id>', methods=['POST'])
 def delete_servicio(id):
@@ -254,7 +265,7 @@ def delete_servicio(id):
         flash('Servicio/Habitación eliminado exitosamente!')
     except Exception as e:
         flash(f'Error al eliminar servicio: {str(e)}')
-    return redirect(url_for('index'))
+    return redirect(url_for('servicios'))
 
 if __name__ == '__main__':
     app.run(debug=True)
