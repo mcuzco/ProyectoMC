@@ -54,3 +54,12 @@ ADD CONSTRAINT detalle_reservas_ibfk_2
 FOREIGN KEY (servicio_id) REFERENCES servicios(id)
 ON DELETE CASCADE
 ON UPDATE CASCADE;
+
+
+-- Tabla para prueba de login 
+
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
