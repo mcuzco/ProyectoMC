@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="container">
+    <h2>Editar Factura</h2>
+    <form action="{{ url_for('update_factura', id=factura['id']) }}" method="POST">
+        {{ form.hidden_tag() }} <!-- CSRF protection -->
+        <div class="form-group">
+            <label for="reserva_id">Reserva ID</label>
+            <select name="reserva_id" id="reserva_id" class="form-control">
+                {% for reserva in reservas %}
+                    <option value="{{ reserva['id'] }}" {% if reserva['id'] == factura['reserva_id'] %}selected{% endif %}>{{ reserva['id'] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="fecha_emision">Fecha de Emisión</label>
+            <input type="date" name="fecha_emision" id="fecha_emision" class="form-control" value="{{ factura['fecha_emision'] }}" required>
+        </div>
+        <div class="form-group">
+            <label for="total">Total</label>
+            <input type="number" name="total" id="total" class="form-control" value="{{ factura['total'] }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Actualizar Factura</button>
+    </form>
+    <a href="{{ url_for('facturas') }}" class="btn btn-secondary">Cancelar</a>
+</div>
+{% endblock %}

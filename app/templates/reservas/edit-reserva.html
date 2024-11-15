@@ -5,15 +5,27 @@
 <form action="{{ url_for('update_reserva', id=reserva.id) }}" method="post">
     <div class="mb-3">
         <label for="clientes" class="form-label">Clientes</label>
-              <select name="cliente_id" id="clientes" class="form-control" required>
-              {% if clientes %}
+        <select name="cliente_id" id="clientes" class="form-control" required>
+            {% if clientes %}
                 {% for cliente in clientes %}
-                <option selected value="{{ cliente.id }}">{{ cliente.nombre }}</option>
+                    <option value="{{ cliente.id }}" {% if cliente.id == reserva.cliente_id %}selected{% endif %}>{{ cliente.nombre }}</option>
                 {% endfor %}
-              {% else %}
-              <option disabled>Sin clientes a quien asignar :/</option>
-              {% endif %}
-              </select>
+            {% else %}
+                <option disabled>Sin clientes a quien asignar :/</option>
+            {% endif %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="habitaciones" class="form-label">Habitaciones</label>
+        <select name="habitacion_id" id="habitaciones" class="form-control" required>
+            {% if habitaciones %}
+                {% for habitacion in habitaciones %}
+                    <option value="{{ habitacion.id }}" {% if habitacion.id == reserva.habitacion_id %}selected{% endif %}>{{ habitacion.numero }}</option>
+                {% endfor %}
+            {% else %}
+                <option disabled>Sin habitaciones disponibles :/</option>
+            {% endif %}
+        </select>
     </div>
     <div class="mb-3">
         <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
@@ -24,10 +36,14 @@
         <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ reserva.fecha_fin }}" required>
     </div>
     <div class="mb-3">
+        <label for="estado" class="form-label">Estado</label>
+        <input type="text" class="form-control" id="estado" name="estado" value="{{ reserva.estado }}" required>
+    </div>
+    <div class="mb-3">
         <label for="servicios" class="form-label">Servicios</label>
         <select name="servicios" id="servicios" class="form-control" multiple required>
             {% for servicio in servicios %}
-            <option selected value="{{ servicio.nombre }}" {% if servicio.nombre in reserva.servicios %}selected{% endif %}>{{ servicio.nombre }}</option>
+                <option value="{{ servicio.id }}" {% if servicio.id in detalles %}selected{% endif %}>{{ servicio.nombre }}</option>
             {% endfor %}
         </select>
     </div>

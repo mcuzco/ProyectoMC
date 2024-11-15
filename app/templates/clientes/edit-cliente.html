@@ -3,6 +3,7 @@
 {% block body %}
 <h2>Editar Cliente</h2>
 <form action="{{ url_for('update_cliente', id=cliente.id) }}" method="post">
+    {{ form.hidden_tag() }} <!-- CSRF protection -->
     <input type="text" name="nombre" value="{{ cliente.nombre }}" placeholder="Nombre" required>
     <input type="email" name="email" value="{{ cliente.email }}" placeholder="Email" required>
     <input type="text" name="telefono" value="{{ cliente.telefono }}" placeholder="Teléfono" required>

@@ -3,6 +3,7 @@
 {% block body %}
 <h2>Editar Servicio</h2>
 <form action="{{ url_for('update_servicio', id=servicio.id) }}" method="post">
+    {{ form.hidden_tag() }}
     <input type="text" name="nombre" value="{{ servicio.nombre }}" placeholder="Nombre" required>
     <input type="text" name="descripcion" value="{{ servicio.descripcion }}" placeholder="Descripción" required>
     <input type="number" name="precio" value="{{ servicio.precio }}" placeholder="Precio" required>
