@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_mysqldb import MySQL
 import os
+import MySQLdb
+import time
 
 app = Flask(__name__)
 
@@ -9,7 +11,7 @@ app.config['SECRET_KEY'] = 'matthews'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'MAtt12233xd'
+app.config['MYSQL_PASSWORD'] = 'MAtt1233xd'
 app.config['MYSQL_DB'] = 'flaskcontact'
 app.config['MYSQL_SSL_DISABLED'] = True  # Deshabilitar SSL
 
@@ -25,7 +27,7 @@ def clientes():
     cursor = mysqldb.connection.cursor()
     cursor.execute('SELECT * FROM clientes')
     clientes = cursor.fetchall()
-    return render_template('clientes/clientes.html', clientes=clientes)
+    return render_template('clientes/clientes.html',clientes=clientes)
 
 @app.route('/add_cliente', methods=['POST'])
 def add_cliente():
@@ -99,6 +101,17 @@ def reservas():
     clientes = cursor.fetchall()
     cursor.execute('SELECT id, numero FROM habitaciones')
     habitaciones = cursor.fetchall()
+    
+    # Fetch services for each reservation
+    for reserva in reservas:
+        cursor.execute('''
+            SELECT servicios.nombre
+            FROM detalle_reservas
+            JOIN servicios ON detalle_reservas.servicio_id = servicios.id
+            WHERE detalle_reservas.reserva_id = %s
+        ''', (reserva['id'],))
+        reserva['servicios'] = [row['nombre'] for row in cursor.fetchall()]
+    
     return render_template('reservas/reservas.html', servicios=servicios, reservas=reservas, clientes=clientes, habitaciones=habitaciones)
 
 @app.route('/add_reserva', methods=['POST'])
@@ -108,20 +121,35 @@ def add_reserva():
         habitacion_id = request.form['habitacion_id']
         fecha_inicio = request.form['fecha_inicio']
         fecha_fin = request.form['fecha_fin']
-        cursor = mysqldb.connection.cursor()
-        cursor.execute('SELECT * FROM clientes WHERE id = %s', (cliente_id,))
-        cliente = cursor.fetchone()
-        if cliente:
-            cursor.execute('INSERT INTO reservas (cliente_id, habitacion_id, fecha_inicio, fecha_fin) VALUES (%s, %s, %s, %s)', (cliente_id, habitacion_id, fecha_inicio, fecha_fin))
-            reserva_id = cursor.lastrowid
-            servicios = request.form.getlist('servicios')
-            for servicio_id in servicios:
-                cursor.execute('INSERT INTO detalle_reservas (reserva_id, servicio_id, habitacion_id) VALUES (%s, %s, %s)', (reserva_id, servicio_id, habitacion_id))
-            mysqldb.connection.commit()
-            flash('Reserva agregada exitosamente!')
-        else:
-            flash('Error: Cliente no encontrado.')
-        return redirect(url_for('reservas'))
+        servicios = request.form.getlist('servicios')
+        
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                cursor = mysqldb.connection.cursor()
+                cursor.execute('SET innodb_lock_wait_timeout = 50')  # Set timeout to 50 seconds
+                cursor.execute('SELECT * FROM clientes WHERE id = %s', (cliente_id,))
+                cliente = cursor.fetchone()
+                if cliente:
+                    cursor.execute('INSERT INTO reservas (cliente_id, habitacion_id, fecha_inicio, fecha_fin) VALUES (%s, %s, %s, %s)', (cliente_id, habitacion_id, fecha_inicio, fecha_fin))
+                    reserva_id = cursor.lastrowid
+                    for servicio_id in servicios:
+                        cursor.execute('INSERT INTO detalle_reservas (reserva_id, servicio_id, habitacion_id) VALUES (%s, %s, %s)', (reserva_id, servicio_id, habitacion_id))
+                    mysqldb.connection.commit()
+                    flash('Reserva agregada exitosamente!')
+                else:
+                    flash('Error: Cliente no encontrado.')
+                return redirect(url_for('reservas'))
+            except MySQLdb.OperationalError as e:
+                if e.args[0] == 1205:  # Lock wait timeout exceeded
+                    if attempt < max_retries - 1:
+                        time.sleep(2)  # Wait for 2 seconds before retrying
+                        continue
+                    else:
+                        flash('Error: Lock wait timeout exceeded. Please try again later.')
+                else:
+                    flash(f'Error: {e}')
+                return redirect(url_for('reservas'))
 
 @app.route('/edit_reserva/<id>', methods=['POST', 'GET'])
 def get_reserva(id):
@@ -245,18 +273,31 @@ def habitaciones():
     habitaciones = cursor.fetchall()
     return render_template('habitaciones/habitaciones.html', habitaciones=habitaciones)
 
-@app.route('/add_habitacion', methods=['POST']) # Ruta para agregar habitaciones
+@app.route('/add_habitacion', methods=['POST', 'GET'])
 def add_habitacion():
     if request.method == 'POST':
         numero = request.form['numero']
         tipo = request.form['tipo']
         precio = request.form['precio']
-        sucursal_id = request.form['sucursal_id']
+        sucursal_nombre = request.form['sucursal_nombre']
+        estado = request.form['estado']
+        
         cursor = mysqldb.connection.cursor()
-        cursor.execute('INSERT INTO habitaciones (numero, tipo, precio, sucursal_id) VALUES (%s, %s, %s, %s)', (numero, tipo, precio, sucursal_id))
-        mysqldb.connection.commit()
-        flash('Habitación agregada exitosamente!')
+        cursor.execute('SELECT id FROM sucursales WHERE nombre = %s', (sucursal_nombre,))
+        sucursal = cursor.fetchone()
+        if sucursal:
+            sucursal_id = sucursal['id']
+            cursor.execute('INSERT INTO habitaciones (numero, tipo, precio, sucursal_id, estado) VALUES (%s, %s, %s, %s, %s)', (numero, tipo, precio, sucursal_id, estado))
+            mysqldb.connection.commit()
+            flash('Habitación agregada exitosamente!')
+        else:
+            flash('Sucursal no encontrada.')
         return redirect(url_for('habitaciones'))
+    else:
+        cursor = mysqldb.connection.cursor()
+        cursor.execute('SELECT nombre FROM sucursales')
+        sucursales = cursor.fetchall()
+        return render_template('add-habitacion.html', sucursales=sucursales)
     
 @app.route('/edit_habitacion/<id>', methods=['POST', 'GET']) # Ruta para editar habitaciones
 def get_habitacion(id):
@@ -267,13 +308,14 @@ def get_habitacion(id):
     sucursales = cursor.fetchall()
     return render_template('habitaciones/edit-habitacion.html', habitacion=habitacion, sucursales=sucursales)
 
-@app.route('/update_habitacion/<id>', methods=['POST']) # Ruta para actualizar habitaciones
+@app.route('/update_habitacion/<int:id>', methods=['POST'])
 def update_habitacion(id):
     if request.method == 'POST':
         numero = request.form['numero']
         tipo = request.form['tipo']
         precio = request.form['precio']
         sucursal_id = request.form['sucursal_id']
+        
         cursor = mysqldb.connection.cursor()
         cursor.execute("""
             UPDATE habitaciones
@@ -368,7 +410,8 @@ def informes():
     informes = cursor.fetchall()
     return render_template('informes/informes.html', informes=informes)
 
-@app.route('/add_informe', methods=['POST']) # Ruta para agregar informes
+
+@app.route('/add_informe', methods=['POST', 'GET']) # Ruta para agregar informes   
 def add_informe():
     if request.method == 'POST':
         tipo = request.form['tipo']
@@ -379,13 +422,12 @@ def add_informe():
         reserva_id = request.form['reserva_id']
         sucursal_id = request.form['sucursal_id']
         cursor = mysqldb.connection.cursor()
-        cursor.execute('''
-            INSERT INTO informes (tipo, descripcion, fecha, total, cliente_id, reserva_id, sucursal_id)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        ''', (tipo, descripcion, fecha, total, cliente_id, reserva_id, sucursal_id))
+        cursor.execute('INSERT INTO informes (tipo, descripcion, fecha, total, cliente_id, reserva_id, sucursal_id) VALUES (%s, %s, %s, %s, %s, %s, %s)', (tipo, descripcion, fecha, total, cliente_id, reserva_id, sucursal_id))
         mysqldb.connection.commit()
         flash('Informe agregado exitosamente!')
         return redirect(url_for('informes'))
+  
+
 
 @app.route('/edit_informe/<id>', methods=['POST', 'GET']) # Ruta para editar informes
 def get_informe(id):

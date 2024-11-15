@@ -14,15 +14,26 @@
                     </div>
                     <div class="mb-3">
                         <label for="tipo" class="form-label">Tipo</label>
-                        <input type="text" class="form-control" id="tipo" name="tipo" placeholder="Tipo" required>
+                        <select class="form-control" id="tipo" name="tipo" required>
+                            <option value="individual">Individual</option>
+                            <option value="matrimonial">Matrimonial</option>
+                            <option value="familiar">Familiar</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="precio" class="form-label">Precio</label>
-                        <input type="text" class="form-control" id="precio" name="precio" placeholder="Precio" required>
+                        <input type="number" class="form-control" id="precio" name="precio" placeholder="Precio" required>
                     </div>
                     <div class="mb-3">
                         <label for="sucursal_nombre" class="form-label">Sucursal</label>
                         <input type="text" class="form-control" id="sucursal_nombre" name="sucursal_nombre" placeholder="Sucursal" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="estado" class="form-label">Estado</label>
+                        <select class="form-control" id="estado" name="estado" required>
+                            <option value="desocupada">Desocupada</option>
+                            <option value="ocupada">Ocupada</option>
+                        </select>
                     </div>
                     <button class="btn btn-primary w-100">Guardar Habitación</button>
                 </form>
@@ -42,6 +53,7 @@
                             <th>Tipo</th>
                             <th>Precio</th>
                             <th>Sucursal</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -52,6 +64,7 @@
                             <td>{{ habitacion.tipo }}</td>
                             <td>{{ habitacion.precio }}</td>
                             <td>{{ habitacion.sucursal_nombre }}</td>
+                            <td>{{ habitacion.estado }}</td>
                             <td>
                                 <a href="{{ url_for('get_habitacion', id=habitacion.id) }}" class="btn btn-secondary btn-sm">
                                     <i class="fas fa-edit"></i> Editar
