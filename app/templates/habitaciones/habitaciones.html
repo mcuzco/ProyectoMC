@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-<div class="row"></div>
+<div class="row mt-4">
     <div class="col-md-5">
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-primary text-white">
@@ -25,9 +25,17 @@
                         <input type="number" class="form-control" id="precio" name="precio" placeholder="Precio" required>
                     </div>
                     <div class="mb-3">
-                        <label for="sucursal_nombre" class="form-label">Sucursal</label>
-                        <input type="text" class="form-control" id="sucursal_nombre" name="sucursal_nombre" placeholder="Sucursal" required>
-                    </div>
+                        <label for="sucursal" class="form-label">Sucursal</label>
+                        <select name="sucursal_id" id="sucursal" class="form-control" required>
+                          {% if sucursales %}
+                            {% for sucursal in sucursales %}
+                              <option value="{{ sucursal.id }}">{{ sucursal.nombre }}</option>
+                            {% endfor %}
+                          {% else %}
+                            <option disabled>Sin sucursales registrados:/</option>
+                          {% endif %}
+                        </select>
+                      </div>
                     <div class="mb-3">
                         <label for="estado" class="form-label">Estado</label>
                         <select class="form-control" id="estado" name="estado" required>

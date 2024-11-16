@@ -11,8 +11,8 @@ app.config['SECRET_KEY'] = 'matthews'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'MAtt1233xd'
-app.config['MYSQL_DB'] = 'flaskcontact'
+app.config['MYSQL_PASSWORD'] = 'Mami270802'
+app.config['MYSQL_DB'] = 'flaskcontact3'
 app.config['MYSQL_SSL_DISABLED'] = True  # Deshabilitar SSL
 
 mysqldb = MySQL(app)
@@ -101,7 +101,7 @@ def reservas():
     servicios = cursor.fetchall()
     cursor.execute('SELECT id, nombre FROM clientes')
     clientes = cursor.fetchall()
-    cursor.execute('SELECT id, numero FROM habitaciones')
+    cursor.execute('SELECT id, numero FROM habitaciones WHERE estado = "desocupada"')
     habitaciones = cursor.fetchall()
     
     # Fetch services for each reservation
@@ -271,9 +271,14 @@ def delete_servicio(id):
 @app.route('/habitaciones') # Ruta para mostrar habitaciones            
 def habitaciones():
     cursor = mysqldb.connection.cursor()
-    cursor.execute('SELECT habitaciones.*, sucursales.nombre AS sucursal_nombre FROM habitaciones JOIN sucursales ON habitaciones.sucursal_id = sucursales.id')
+    cursor.execute("""SELECT habitaciones.*,
+                        sucursales.nombre AS sucursal_nombre
+                    FROM habitaciones JOIN sucursales ON habitaciones.sucursal_id = sucursales.id""")
     habitaciones = cursor.fetchall()
-    return render_template('habitaciones/habitaciones.html', habitaciones=habitaciones)
+    #Fetch all sucursales for the dropdown
+    cursor.execute('SELECT id, nombre FROM sucursales')
+    sucursales = cursor.fetchall()
+    return render_template('habitaciones/habitaciones.html', habitaciones=habitaciones,sucursales = sucursales)
 
 @app.route('/add_habitacion', methods=['POST', 'GET'])
 def add_habitacion():
@@ -281,15 +286,15 @@ def add_habitacion():
         numero = request.form['numero']
         tipo = request.form['tipo']
         precio = request.form['precio']
-        sucursal_nombre = request.form['sucursal_nombre']
+        sucursalId = request.form['sucursal_id']
         estado = request.form['estado']
         
         cursor = mysqldb.connection.cursor()
-        cursor.execute('SELECT id FROM sucursales WHERE nombre = %s', (sucursal_nombre,))
+        cursor.execute('SELECT id, nombre FROM sucursales WHERE id = %s', (sucursalId,))
         sucursal = cursor.fetchone()
         if sucursal:
-            sucursal_id = sucursal['id']
-            cursor.execute('INSERT INTO habitaciones (numero, tipo, precio, sucursal_id, estado) VALUES (%s, %s, %s, %s, %s)', (numero, tipo, precio, sucursal_id, estado))
+            sucursalId = sucursal['id']
+            cursor.execute('INSERT INTO habitaciones (numero, tipo, precio, sucursal_id, estado) VALUES (%s, %s, %s, %s, %s)', (numero, tipo, precio, sucursalId, estado))
             mysqldb.connection.commit()
             flash('Habitación agregada exitosamente!')
         else:
@@ -297,7 +302,7 @@ def add_habitacion():
         return redirect(url_for('habitaciones'))
     else:
         cursor = mysqldb.connection.cursor()
-        cursor.execute('SELECT nombre FROM sucursales')
+        cursor.execute('SELECT id, nombre FROM sucursales')
         sucursales = cursor.fetchall()
         return render_template('add-habitacion.html', sucursales=sucursales)
     
@@ -366,8 +371,8 @@ def add_sucursal():
 def get_sucursal(id):
     cursor = mysqldb.connection.cursor()
     cursor.execute('SELECT * FROM sucursales WHERE id = %s', (id,))
-    sucursal = cursor.fetchone()
-    return render_template('sucursales/edit-sucursal.html', sucursal=sucursal)
+    sucursal = cursor.fetchone()    
+    return render_template('sucursales/edit-sucursales.html', sucursal=sucursal)
 
 @app.route('/update_sucursal/<id>', methods=['POST']) # Ruta para actualizar sucursales
 def update_sucursal(id):
