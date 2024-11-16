@@ -30,7 +30,8 @@
         width: 170px;
         top: -75px;
         border-radius: 50%;
-        background: #60a3bc;
+        /* color del logo*/
+        background: #88bace;
         padding: 10px;
         text-align: center;
     }

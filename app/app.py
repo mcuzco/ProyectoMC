@@ -35,10 +35,9 @@ def login():
             return redirect(url_for('index')) 
         else: 
             flash('Usuario o contraseña incorrectos', 'danger')
-    
     return render_template('login.html')
 
-# Ruta para registrar nuevos usuarios
+# Ruta para Registrase
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -60,8 +59,14 @@ def register():
         except Exception as e:
             flash(f'Error al registrar usuario: {str(e)}', 'danger')
             return redirect(url_for('register'))
-
     return render_template('register.html')
+
+# Ruta para cerrar sesión
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None) 
+    flash('Sesión Cerada', 'info')
+    return redirect(url_for('login'))
     
 ###################################################################################
 
@@ -93,7 +98,6 @@ def index():
     # Fetch all services
     cursor.execute('SELECT * FROM servicios')
     servicios = cursor.fetchall()
-    
     return render_template('index.html', clientes=clientes, reservas=reservas, servicios=servicios)
 
 # CRUD de Clientes
