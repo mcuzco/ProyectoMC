@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from werkzeug.security import generate_password_hash, check_password_hash  
 from flask_mysqldb import MySQL
 import os
 import MySQLdb
 import time
+
 
 app = Flask(__name__)
 
@@ -11,14 +13,63 @@ app.config['SECRET_KEY'] = 'matthews'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Mami270802'
-app.config['MYSQL_DB'] = 'flaskcontact3'
+app.config['MYSQL_PASSWORD'] = 'Rafael2002'
+app.config['MYSQL_DB'] = 'flaskcontact'
 app.config['MYSQL_SSL_DISABLED'] = True  # Deshabilitar SSL
 
 mysqldb = MySQL(app)
 
+# URL de Login
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        cursor = mysqldb.connection.cursor()
+        cursor.execute('SELECT * FROM usuarios WHERE username = %s', (username,))
+        user = cursor.fetchone()
+
+        if user and check_password_hash(user['password'], password):
+            session['user_id'] = user['id']
+            # flash('Login exitoso!', 'success')
+            return redirect(url_for('home')) 
+        else: 
+            flash('Usuario o contraseña incorrectos', 'danger')
+    return render_template('login.html')
+
+# Ruta para Registrase
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username'] 
+        password = request.form['password']
+
+        if not username or not password:
+            flash('Todos los campos son obligatorios', 'danger')
+            return redirect(url_for('register'))
+        
+        hashed_password = generate_password_hash(password) 
+        cursor = mysqldb.connection.cursor()
+
+        try:
+            cursor.execute('INSERT INTO usuarios (username, password) VALUES (%s, %s)', (username, hashed_password))
+            mysqldb.connection.commit()
+            flash('Usuario registrado exitosamente', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            flash(f'Error al registrar usuario: {str(e)}', 'danger')
+            return redirect(url_for('register'))
+    return render_template('register.html')
+
+# Ruta para cerrar sesión
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None) 
+    flash('Sesión Cerada', 'info')
+    return redirect(url_for('login'))
+    
 # home
-@app.route('/')
+@app.route('/home')
 def home():
     return render_template('home.html')
 
