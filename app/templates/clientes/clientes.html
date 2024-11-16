@@ -7,7 +7,7 @@
           <div class="card-header bg-primary text-white">
             <h5 class="card-title mb-0">Agregar Cliente</h5>
           </div>
-          <div class="card-body"></div>
+          <div class="card-body">
             <form action="{{ url_for('add_cliente') }}" method="POST">
               <div class="mb-3">
                 <label for="nombre" class="form-label">Nombre</label>
@@ -78,5 +78,5 @@
           return false;
         }
       }
-    </script>
-  {% endblock %}
+      </script>
+    {% endblock %}

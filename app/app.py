@@ -28,7 +28,7 @@ def clientes():
     cursor.execute('SELECT * FROM clientes')
     clientes = cursor.fetchall()
     return render_template('clientes/clientes.html',clientes=clientes)
-
+# CRUD de Clientes
 @app.route('/add_cliente', methods=['POST'])
 def add_cliente():
     if request.method == 'POST':
@@ -43,14 +43,14 @@ def add_cliente():
         except Exception as e:
             flash(f'Error al agregar cliente: {str(e)}')
         return redirect(url_for('clientes'))
-
+#EDITS CLIENT (GET)
 @app.route('/edit_cliente/<id>', methods=['POST', 'GET'])
 def get_cliente(id):
     cursor = mysqldb.connection.cursor()
     cursor.execute('SELECT * FROM clientes WHERE id = %s', (id,))
     cliente = cursor.fetchone()
     return render_template('clientes/edit-cliente.html', cliente=cliente)
-
+#(POST)
 @app.route('/update_cliente/<id>', methods=['POST'])
 def update_cliente(id):
     if request.method == 'POST':
@@ -76,8 +76,10 @@ def update_cliente(id):
 def delete_cliente(id):
     try:
         cursor = mysqldb.connection.cursor()
+        # Eliminar reservas asociadas al cliente
         cursor.execute('DELETE FROM detalle_reservas WHERE reserva_id IN (SELECT id FROM reservas WHERE cliente_id = %s)', (id,))
         cursor.execute('DELETE FROM reservas WHERE cliente_id = %s', (id,))
+        # Eliminar el cliente
         cursor.execute('DELETE FROM clientes WHERE id = %s', (id,))
         mysqldb.connection.commit()
         flash('Cliente y sus reservas asociadas eliminados exitosamente!')
@@ -306,7 +308,7 @@ def get_habitacion(id):
     habitacion = cursor.fetchone()
     cursor.execute('SELECT id, nombre FROM sucursales')
     sucursales = cursor.fetchall()
-    return render_template('habitaciones/edit-habitacion.html', habitacion=habitacion, sucursales=sucursales)
+    return render_template('habitaciones/edit-habitaciones.html', habitacion=habitacion, sucursales=sucursales)
 
 @app.route('/update_habitacion/<int:id>', methods=['POST'])
 def update_habitacion(id):
