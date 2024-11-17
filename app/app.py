@@ -5,7 +5,6 @@ import os
 import MySQLdb
 import time
 
-
 app = Flask(__name__)
 
 # Set the secret key to a random value
@@ -22,20 +21,23 @@ mysqldb = MySQL(app)
 # URL de Login
 @app.route('/', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
+    if session.get('user_id'):  # Si el usuario ya inició sesión
+        return redirect(url_for('home')) 
+    
+    if request.method == 'POST':  # Si es un intento de inicio de sesión
         username = request.form['username']
         password = request.form['password']
         cursor = mysqldb.connection.cursor()
         cursor.execute('SELECT * FROM usuarios WHERE username = %s', (username,))
         user = cursor.fetchone()
 
-        if user and check_password_hash(user['password'], password):
+        if user and check_password_hash(user['password'], password):  # Credenciales correctas
             session['user_id'] = user['id']
-            # flash('Login exitoso!', 'success')
-            return redirect(url_for('home')) 
+            return redirect(url_for('home'))  # Redirige al home
         else: 
-            flash('Usuario o contraseña incorrectos', 'danger')
-    return render_template('login.html')
+            flash('Usuario o contraseña incorrectos', 'danger')  # Mensaje de error
+    
+    return render_template('login.html')  # Muestra el login si no hay sesión activa
 
 # Ruta para Registrase
 @app.route('/register', methods=['GET', 'POST'])

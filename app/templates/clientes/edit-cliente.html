@@ -8,6 +8,7 @@
     <input type="text" name="telefono" value="{{ cliente.telefono }}" placeholder="Teléfono" required>
     <button type="submit">Actualizar Cliente</button>
 </form>
-<a href="{{ url_for('home') }}">Volver</a>
-<a href="{{ url_for('clientes') }}">Volver</a>
-{% endblock %}
+<a href="{{ url_for('clientes') }}" style="margin-top:7px;" class="btn btn-secondary btn-sm">
+    <i class="fas fa-arrow-left "></i> Volver
+    </a>
+    {% endblock %}
