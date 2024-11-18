@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+
 {% block body %}
 <div class="row">
     <div class="col-md-7" style="position: absolute; left: 280px;">
@@ -22,9 +23,11 @@
                             <td>{{ factura.id }}</td>
                             <td>{{ factura.fecha_emision }}</td>
                             <td>{{ factura.clientes }}</td>
-                            <td  class="btn btn-secondary btn-sm" >
-                                <i class="fa-solid fa-file-pdf"></i> Ver PDF
-                                <!-- aqui poner url que mostrará pdf  -->
+                            <td class="btn btn-secundario btn-sm">
+                                <a href="{{ url_for('download_report', factura_id=factura.id) }}"
+                                    style="text-decoration: none; color: black;">
+                                    <i class="fa-solid fa-file-pdf"></i> Ver PDF
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -46,4 +49,5 @@
         }
     }
 </script>
+
 {% endblock %}

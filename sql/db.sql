@@ -64,7 +64,7 @@ CREATE TABLE detalle_reservas (
 CREATE TABLE facturas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     reserva_id INT NOT NULL,
-    fecha_emision DATE NOT NULL,
+	fecha_emision DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     total DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE ON UPDATE CASCADE
 );

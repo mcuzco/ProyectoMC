@@ -34,7 +34,9 @@
         top: -75px;
         border-radius: 50%;
         /* color del logo*/
-        background: #88bace;
+        background: #8E2DE2;
+        background: -webkit-linear-gradient(to right, #4A00E0, #8E2DE2);
+        background: linear-gradient(to right, #4A00E0, #8E2DE2);
         padding: 10px;
         text-align: center;
     }

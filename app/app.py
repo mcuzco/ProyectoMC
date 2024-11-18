@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, make_response
 from werkzeug.security import generate_password_hash, check_password_hash  
+from reportlab.pdfgen import canvas
 from flask_mysqldb import MySQL
-import os
+import os, io
 import MySQLdb
 import time
-
+# import mysql
+# import pymysql
 
 app = Flask(__name__)
 
@@ -13,8 +15,8 @@ app.config['SECRET_KEY'] = 'matthews'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Mami270802'
-app.config['MYSQL_DB'] = 'flaskcontact3'
+app.config['MYSQL_PASSWORD'] = 'Rafael2002'
+app.config['MYSQL_DB'] = 'flaskcontact'
 app.config['MYSQL_SSL_DISABLED'] = True  # Deshabilitar SSL
 
 mysqldb = MySQL(app)
@@ -22,6 +24,9 @@ mysqldb = MySQL(app)
 # URL de Login
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    if session.get('user_id'):  # Si el usuario ya inició sesión
+        return redirect(url_for('home')) 
+    
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -31,10 +36,10 @@ def login():
 
         if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
-            # flash('Login exitoso!', 'success')
-            return redirect(url_for('home')) 
+            return redirect(url_for('home'))
         else: 
             flash('Usuario o contraseña incorrectos', 'danger')
+    
     return render_template('login.html')
 
 # Ruta para Registrase
@@ -554,5 +559,75 @@ def facturas():
     ''')
     facturas = cursor.fetchall()
     return render_template('facturas/facturas.html', facturas=facturas)
+
+# Ruta para generar y descargar el PDF
+@app.route('/download_report/<int:factura_id>')
+def download_report(factura_id):
+    
+    cursor = mysqldb.connection.cursor()
+    
+    cursor.execute('SELECT * FROM facturas WHERE id = %s', (factura_id,))
+    factura = cursor.fetchone()
+    
+    if factura:
+
+        reserva_id = factura['reserva_id']
+        
+        cursor.execute('''
+            SELECT clientes.nombre
+            FROM clientes
+            INNER JOIN reservas ON reservas.cliente_id = clientes.id
+            WHERE reservas.id = %s
+        ''', (reserva_id,))
+        
+        cliente = cursor.fetchone()
+
+        cursor.execute('''
+            SELECT habitaciones.numero FROM habitaciones
+            INNER JOIN reservas ON reservas.habitacion_id = habitaciones.id
+            WHERE reservas.id = %s
+        ''', (reserva_id,))
+        
+        habitacion = cursor.fetchone()
+        
+        cursor.close()
+        
+        if cliente and habitacion:
+            # Formatear la fecha
+            fecha_emision = factura['fecha_emision'].strftime('%d de %B de %Y %H:%M:%S')
+            
+            # Crear un buffer para el PDF
+            buffer = io.BytesIO()
+
+            # Usar reportlab para crear el PDF
+            pdf = canvas.Canvas(buffer)
+
+            # Dibujar los datos de la factura en el PDF
+            pdf.setFont("Helvetica-Bold", 14)
+            pdf.drawString(250, 800, f"Factura")
+            pdf.setFont("Helvetica", 12) 
+            pdf.drawString(100, 780, f"ID Factura: {factura['id']}")
+            pdf.drawString(100, 760, f"ID Reserva: {factura['reserva_id']}")
+            pdf.drawString(100, 740, f"Nombre: {cliente['nombre']}") 
+            pdf.drawString(100, 720, f"Habitación: {habitacion['numero']}") 
+            pdf.drawString(100, 700, f"Total a pagar: ${factura['total']:.2f}")
+            pdf.drawString(100, 680, f"Fecha de emisión: {fecha_emision}")
+            pdf.line(50, 650, 550, 650)
+            pdf.setFont("Helvetica-Oblique", 10)
+            pdf.drawString(100, 640, "¡Esperamos que vuelva pronto!")
+
+            pdf.save()
+
+            # Obtener el contenido del buffer
+            buffer.seek(0)
+            response = make_response(buffer.getvalue())
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = f'inline; filename=factura_{factura_id}.pdf'
+            return response
+        else:
+            return 'Cliente o Habitación no encontrados', 404
+    else:
+        return 'Factura no encontrada', 404
+    
 if __name__ == '__main__':
     app.run(debug=True)
