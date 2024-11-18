@@ -11,11 +11,11 @@ import time
 app = Flask(__name__)
 
 # Set the secret key to a random value
-app.config['SECRET_KEY'] = 'matthews'
+app.config['SECRET_KEY'] = '<key>'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Rafael2002'
+app.config['MYSQL_PASSWORD'] = '<password>'
 app.config['MYSQL_DB'] = 'flaskcontact'
 app.config['MYSQL_SSL_DISABLED'] = True  # Deshabilitar SSL
 
@@ -465,89 +465,6 @@ def delete_sucursal(id):
     except Exception as e:
         flash(f'Error al eliminar sucursal: {str(e)}')
     return redirect(url_for('sucursales'))
-
-@app.route('/informes') # Ruta para mostrar informes
-def informes():
-    cursor = mysqldb.connection.cursor()
-    cursor.execute('''
-        SELECT informes.id, informes.tipo, informes.descripcion, informes.fecha, informes.total, 
-               clientes.nombre AS cliente_nombre, reservas.id AS reserva_id, sucursales.nombre AS sucursal_nombre
-        FROM informes
-        LEFT JOIN clientes ON informes.cliente_id = clientes.id
-        LEFT JOIN reservas ON informes.reserva_id = reservas.id
-        LEFT JOIN sucursales ON informes.sucursal_id = sucursales.id
-    ''')
-    informes = cursor.fetchall()
-    return render_template('informes/informes.html', informes=informes)
-
-
-@app.route('/add_informe', methods=['POST', 'GET']) # Ruta para agregar informes   
-def add_informe():
-    if request.method == 'POST':
-        tipo = request.form['tipo']
-        descripcion = request.form['descripcion']
-        fecha = request.form['fecha']
-        total = request.form['total']
-        cliente_id = request.form['cliente_id']
-        reserva_id = request.form['reserva_id']
-        sucursal_id = request.form['sucursal_id']
-        cursor = mysqldb.connection.cursor()
-        cursor.execute('INSERT INTO informes (tipo, descripcion, fecha, total, cliente_id, reserva_id, sucursal_id) VALUES (%s, %s, %s, %s, %s, %s, %s)', (tipo, descripcion, fecha, total, cliente_id, reserva_id, sucursal_id))
-        mysqldb.connection.commit()
-        flash('Informe agregado exitosamente!')
-        return redirect(url_for('informes'))
-  
-
-
-@app.route('/edit_informe/<id>', methods=['POST', 'GET']) # Ruta para editar informes
-def get_informe(id):
-    cursor = mysqldb.connection.cursor()
-    cursor.execute('SELECT * FROM informes WHERE id = %s', (id,))
-    informe = cursor.fetchone()
-    cursor.execute('SELECT id, nombre FROM clientes')
-    clientes = cursor.fetchall()
-    cursor.execute('SELECT id FROM reservas')
-    reservas = cursor.fetchall()
-    cursor.execute('SELECT id, nombre FROM sucursales')
-    sucursales = cursor.fetchall()
-    return render_template('informes/edit-informe.html', informe=informe, clientes=clientes, reservas=reservas, sucursales=sucursales)
-
-@app.route('/update_informe/<id>', methods=['POST']) # Ruta para actualizar informes
-def update_informe(id):
-    if request.method == 'POST':
-        tipo = request.form['tipo']
-        descripcion = request.form['descripcion']
-        fecha = request.form['fecha']
-        total = request.form['total']
-        cliente_id = request.form['cliente_id']
-        reserva_id = request.form['reserva_id']
-        sucursal_id = request.form['sucursal_id']
-        cursor = mysqldb.connection.cursor()
-        cursor.execute('''
-            UPDATE informes
-            SET tipo = %s,
-                descripcion = %s,
-                fecha = %s,
-                total = %s,
-                cliente_id = %s,
-                reserva_id = %s,
-                sucursal_id = %s
-            WHERE id = %s
-        ''', (tipo, descripcion, fecha, total, cliente_id, reserva_id, sucursal_id, id))
-        mysqldb.connection.commit()
-        flash('Informe actualizado exitosamente!')
-        return redirect(url_for('informes'))
-
-@app.route('/delete_informe/<string:id>', methods=['POST']) # Ruta para eliminar informes
-def delete_informe(id):
-    try:
-        cursor = mysqldb.connection.cursor()
-        cursor.execute('DELETE FROM informes WHERE id = %s', (id,))
-        mysqldb.connection.commit()
-        flash('Informe eliminado exitosamente!')
-    except Exception as e:
-        flash(f'Error al eliminar informe: {str(e)}')
-    return redirect(url_for('informes'))
 
 @app.route('/facturas') # Ruta para mostrar facturas
 def facturas():
