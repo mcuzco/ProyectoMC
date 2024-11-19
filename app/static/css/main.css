@@ -90,3 +90,30 @@ html, body {
 .nav ul li a:hover {
   color: #1abc9c; /* Verde claro */
 }
+ /* Footer */
+ footer {
+  background-color: #333;
+  color: white;
+  padding: 30px 0;
+  text-align: center;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-content p {
+  margin: 0 0 10px;
+}
+
+.socials a {
+  color: white;
+  margin: 0 10px;
+  font-size: 25px;
+  text-decoration: none;
+}
+
+.socials a:hover {
+  color: #007bff;
+}

@@ -1,6 +1,6 @@
 -- Crear base de datos
-CREATE DATABASE flaskcontact;
-USE flaskcontact;
+CREATE DATABASE flaskcontact4;
+USE flaskcontact4;
 
 -- Tabla de Clientes
 CREATE TABLE clientes (
@@ -64,34 +64,12 @@ CREATE TABLE detalle_reservas (
 CREATE TABLE facturas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     reserva_id INT NOT NULL,
-	fecha_emision DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    cliente_id INT NOT NULL,
+    fecha_emision timestamp NOT NULL default current_timestamp,
     total DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Tabla de Informes
-CREATE TABLE informes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    tipo VARCHAR(50) NOT NULL,
-    descripcion TEXT,
-    fecha DATE NOT NULL,
-    total DECIMAL(10, 2),
-    cliente_id INT,
-    reserva_id INT,
-    sucursal_id INT,
-    FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE SET NULL ON UPDATE CASCADE,
-    FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE SET NULL ON UPDATE CASCADE,
-    FOREIGN KEY (sucursal_id) REFERENCES sucursales(id) ON DELETE SET NULL ON UPDATE CASCADE
-);
-
--- Tabla para Historial de Reservas
-CREATE TABLE historial_reservas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    reserva_id INT NOT NULL,
-    accion VARCHAR(255) NOT NULL,
-    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE ON UPDATE CASCADE
-);
 
 -- Tabla para registrar usuarios
 CREATE TABLE usuarios (
