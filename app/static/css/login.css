@@ -13,8 +13,9 @@
         width: 350px;
         margin-top: auto;
         margin-bottom: auto;
-        background: #f39c12;
-        position: relative;
+        background: #a454e9;
+        background: -webkit-linear-gradient(to right, #551ec4, #7936b4);
+        background: linear-gradient(to right, #4A00E0, #8E2DE2);        position: relative;
         display: flex;
         justify-content: center;
         flex-direction: column;

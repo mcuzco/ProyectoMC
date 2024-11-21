@@ -75,6 +75,11 @@ CREATE TABLE facturas (
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    cedula INT(10) NOT NULL,
+    telefono INT(10) NOT NULL,
     password VARCHAR(255) NOT NULL
 );
 

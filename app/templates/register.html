@@ -1,38 +1,52 @@
-<!--register section-->
 {% extends "layout.html" %}
 
 {% block body %}
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 
-<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+<!-- Referencia al archivo CSS externo -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
 
-<div class="container-fluid">
-    <form action="{{ url_for('register') }}" method="POST" class="register-form">
-        <div class="row">
-            <div class="col-md-4 col-sm-4 col-lg-4">
-                <label style="color: black;" for="username">Username</label>
-                <input  id="username" name="username" placeholder="username" class="form-control" type="text" required >
+<div class="container-fluid form-container">
+    <div class="form-content">
+        <legend>Formulario de Registro de Usuarios</legend>
+        <form action="{{ url_for('register') }}" method="POST" class="register-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input id="username" name="username" placeholder="Username" class="form-control" type="text" required>
             </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-4 col-sm-4 col-lg-4">
-                <label style="color: black;"  for="password">Password</label>
-                <input id="password" name="password" placeholder="password" class="form-control" type="password" required>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" name="password" placeholder="Password" class="form-control" type="password" required>
             </div>
-        </div>
-        <hr>
-        <div class="row">
-            <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
+            <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <input id="nombre" name="nombre" placeholder="Nombre" class="form-control" type="text" required>
+            </div>
+            <div class="form-group">
+                <label for="apellido">Apellido</label>
+                <input id="apellido" name="apellido" placeholder="Apellido" class="form-control" type="text" required>
+            </div>
+            <div class="form-group">
+                <label for="correo">Correo</label>
+                <input id="correo" name="correo" placeholder="Correo" class="form-control" type="email" required>
+            </div>
+            <div class="form-group">
+                <label for="cedula">Cedula</label>
+                <input id="cedula" name="cedula" placeholder="Cedula" class="form-control" type="text" required>
+            </div>
+            <div class="form-group">
+                <label for="telefono">Telefono</label>
+                <input id="telefono" name="telefono" placeholder="Telefono" class="form-control" type="text" required>
+            </div>
+            <hr>
+            <div class="form-group text-center">
                 <button type="submit" class="btn btn-primary regbutton">Registrarse</button>
-            </div>
-            <div class="col-md-6 col-sm-6 col-xs-6 col-lg-6">
                 <a href="{{ url_for('login') }}" class="btn btn-default logbutton">Login</a>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 {% endblock %}

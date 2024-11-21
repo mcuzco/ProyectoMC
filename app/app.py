@@ -15,8 +15,8 @@ app.config['SECRET_KEY'] = 'matthews'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'MAtt1233xd'
-app.config['MYSQL_DB'] = 'flaskcontact4'
+app.config['MYSQL_PASSWORD'] = 'Rafael2002'
+app.config['MYSQL_DB'] = 'flaskcontact'
 app.config['MYSQL_SSL_DISABLED'] = True  # Deshabilitar SSL
 
 mysqldb = MySQL(app)
@@ -42,28 +42,41 @@ def login():
     
     return render_template('login.html')
 
-# Ruta para Registrase
+# URL de Registrar Usuarios
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username'] 
+        username = request.form['username']
+        nombre = request.form['nombre']
+        apellido = request.form['apellido']
+        email = request.form['correo']
+        cedula = request.form['cedula']
+        telefono = request.form['telefono']
         password = request.form['password']
 
-        if not username or not password:
+        if not all([username, nombre, apellido, email, cedula, telefono, password]):
             flash('Todos los campos son obligatorios', 'danger')
             return redirect(url_for('register'))
         
-        hashed_password = generate_password_hash(password) 
+        hashed_password = generate_password_hash(password)
         cursor = mysqldb.connection.cursor()
 
         try:
-            cursor.execute('INSERT INTO usuarios (username, password) VALUES (%s, %s)', (username, hashed_password))
+            cursor.execute('''
+                INSERT INTO usuarios (username, nombre, apellido, email, cedula, telefono, password)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ''', (username, nombre, apellido, email, cedula, telefono, hashed_password))
+            
             mysqldb.connection.commit()
             flash('Usuario registrado exitosamente', 'success')
             return redirect(url_for('login'))
+        
         except Exception as e:
             flash(f'Error al registrar usuario: {str(e)}', 'danger')
             return redirect(url_for('register'))
+        finally:
+            cursor.close()
+
     return render_template('register.html')
 
 # Ruta para cerrar sesión
