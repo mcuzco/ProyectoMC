@@ -1,3 +1,4 @@
+# drop database flaskcontact;
 -- Crear base de datos
 CREATE DATABASE flaskcontact4;
 USE flaskcontact4;
@@ -25,6 +26,7 @@ CREATE TABLE habitaciones (
     tipo ENUM('individual', 'matrimonial', 'familiar') NOT NULL,
     precio DECIMAL(10, 2) NOT NULL,
     sucursal_id INT,
+    estado ENUM('ocupada', 'desocupada') DEFAULT 'desocupada',
     FOREIGN KEY (sucursal_id) REFERENCES sucursales(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -64,14 +66,13 @@ CREATE TABLE detalle_reservas (
 CREATE TABLE facturas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     reserva_id INT NOT NULL,
-    cliente_id INT NOT NULL,
+    cliente_id INT NOT NULL,	
     fecha_emision timestamp NOT NULL default current_timestamp,
     total DECIMAL(10, 2) NOT NULL,
     FOREIGN KEY (reserva_id) REFERENCES reservas(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
--- Tabla para registrar usuarios
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
@@ -82,6 +83,4 @@ CREATE TABLE usuarios (
     telefono INT(10) NOT NULL,
     password VARCHAR(255) NOT NULL
 );
-
-ALTER TABLE habitaciones
-ADD COLUMN estado ENUM('ocupada', 'desocupada') DEFAULT 'desocupada';
+##################################################################################################################################
