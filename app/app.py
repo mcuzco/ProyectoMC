@@ -11,7 +11,7 @@ import time
 app = Flask(__name__)
 
 # Set the secret key to a random value
-app.config['SECRET_KEY'] = '<key>'
+app.config['SECRET_KEY'] = 'matthews'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
