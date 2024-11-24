@@ -1,0 +1,119 @@
+body {
+  background: #8E2DE2;
+  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #4A00E0, #8E2DE2);
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #4A00E0, #8E2DE2);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+.select {
+  margin-bottom: 20px;
+}
+
+.select select {
+  width: 60%;
+  padding: 10px;
+  border: 2px solid #8d959e;
+  border-radius: 6px;
+  font-size: 16px;
+  background-color: #f8f9fa;
+  transition: border-color 0.3s ease;
+  appearance: none;
+}
+
+.select select option:hover {
+  background-color: #e9ecef;
+}
+
+html, body {
+  height: 100%;  /* Asegura que el cuerpo y el HTML ocupen el 100% de la altura de la ventana */
+  margin: 0;     /* Elimina márgenes por defecto */
+  display: flex; /* Usar Flexbox */
+  flex-direction: column; /* Organiza los elementos de arriba hacia abajo */
+}
+
+.container {
+  flex: 1; /* Hace que el contenido ocupe el espacio disponible y empuje el footer hacia abajo */
+}
+
+.footer {
+  margin-top: auto; /* Asegura que el footer se coloque siempre al final */
+}
+
+/* Contenedor principal de navegación */
+.nav {
+  padding: 20px;
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center;
+  min-height: 10vh; /* Ocupa toda la altura de la ventana */
+}
+
+/* Contenedor del grid */
+.nav nav ul {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Tres columnas */
+  gap: 50px; /* Espacio entre cuadros */
+  list-style-type: none; /* Sin puntos en la lista */
+  padding: 0;
+  margin: 0;
+}
+
+/* Estilo de cada cuadro */
+.nav ul li {
+  background-color: #2c3e50; /* Fondo oscuro */
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra elegante */
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.nav ul li:hover {
+  transform: scale(1.05); /* Aumenta el tamaño al pasar el mouse */
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* Mayor sombra */
+}
+
+/* Estilo de los enlaces */
+.nav ul li a {
+  display: block;
+  color: #ecf0f1; /* Blanco suave */
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Cambio de color al pasar el mouse */
+.nav ul li a:hover {
+  color: #1abc9c; /* Verde claro */
+}
+ /* Footer */
+ footer {
+  background-color: #333;
+  color: white;
+  padding: 30px 0;
+  text-align: center;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-content p {
+  margin: 0 0 10px;
+}
+
+.socials a {
+  color: white;
+  margin: 0 10px;
+  font-size: 25px;
+  text-decoration: none;
+}
+
+.socials a:hover {
+  color: #007bff;
+}

@@ -1,0 +1,25 @@
+<!--Editar Sucursales-->
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="container">
+    <h2 style="color: aliceblue;">Editar Sucursal</h2>
+    <form action="{{ url_for('update_sucursal', id=sucursal['id']) }}" method="POST">
+        <div class="form-group">
+            <label for="nombre" style="color: aliceblue;">Nombre:</label>
+            <input type="text" id="nombre" class="form-control" name="nombre" value="{{ sucursal['nombre'] }}" required>
+        </div><br>
+        <div class="form-group">
+            <label for="direccion" style="color: aliceblue;">Dirección:</label>
+            <input type="text" id="direccion" class="form-control" name="direccion" value="{{ sucursal['direccion'] }}" required>
+        </div><br>
+        <div class="form-group">
+            <label for="telefono" style="color: aliceblue;">Teléfono:</label>
+            <input type="text" id="telefono" class="form-control" name="telefono" value="{{ sucursal['telefono'] }}" required>
+        </div><br>
+        <button type="submit" class="btn btn-primary">Actualizar</button>
+    </form>
+    <br>
+    <a href="{{ url_for('sucursales') }}" class="btn btn-secondary">Volver</a>
+</div>
+{% endblock %}

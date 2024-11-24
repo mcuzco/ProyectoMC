@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<header>
+    <div class="logo">
+        <img src="https://img.icons8.com/ios/452/hotel-star.png" class="logo-img" alt="logo">
+        <h1 class="site-title">HOTEL</h1>
+    </div>
+</header>
+
+<!-- Barra de navegación -->
+<div class="nav">
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('clientes') }}">CLIENTES</a></li>
+            <li><a href="{{ url_for('reservas') }}">RESERVAS</a></li>
+            <li><a href="{{ url_for('servicios') }}">SERVICIOS</a></li>
+            <li><a href="{{ url_for('habitaciones') }}">HABITACIONES</a></li>
+            <li><a href="{{ url_for('sucursales') }}">SUCURSALES</a></li>
+        </ul>
+    </nav>
+</div>
+
+<!-- Reloj -->
+<div class="clock">
+    <span id="time"></span>
+</div>
+
+<style>
+    /* Estilo para el Header */
+    header {
+        background-color: #333;
+        padding: 20px 0;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .logo-img {
+        height: 50px;
+        margin-right: 15px;
+    }
+
+    .site-title {
+        color: #fff;
+        font-size: 32px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+    }
+
+    /* Barra de navegación */
+    .nav {
+        background: linear-gradient(45deg, #0056b3, #007bff);
+        padding: 15px 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+    }
+
+    nav ul li {
+        margin: 0 15px;
+    }
+
+    nav ul li a {
+        color: white;
+        text-decoration: none;
+        font-size: 18px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        transition: color 0.3s, transform 0.3s ease-in-out, background 0.3s ease-in-out;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+
+    nav ul li a:hover {
+        color: #f1f1f1;
+        transform: translateY(-3px);
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Reloj */
+    .clock {
+        text-align: center;
+        font-size: 30px;
+        font-weight: 600;
+        color: #333;
+    }
+
+   
+</style>
+
+<script>
+    // Script para el reloj
+    function updateClock() {
+        const timeElement = document.getElementById('time');
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+
+    setInterval(updateClock, 1000);
+
+    // Iniciar el reloj
+    updateClock();
+</script>
+
+{% endblock %}

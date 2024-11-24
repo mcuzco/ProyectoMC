@@ -1,0 +1,58 @@
+<!--Editar reservas-->
+{% extends "layout.html" %}
+
+{% block body %}
+<h2>Editar Reserva</h2>
+<form action="{{ url_for('update_reserva', id=reserva.id) }}" method="post">
+    <div class="mb-3">
+        <label for="clientes" class="form-label">Clientes</label>
+        <select name="cliente_id" id="clientes" class="form-control" required>
+            {% if clientes %}
+                {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}" {% if cliente.id == reserva.cliente_id %}selected{% endif %}>{{ cliente.nombre }}</option>
+                {% endfor %}
+            {% else %}
+                <option disabled>Sin clientes a quien asignar :/</option>
+            {% endif %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="habitaciones" class="form-label">Habitaciones</label>
+        <select name="habitacion_id" id="habitaciones" class="form-control" required>
+            {% if habitaciones %}
+                {% for habitacion in habitaciones %}
+                    <option value="{{ habitacion.id }}" {% if habitacion.id == reserva.habitacion_id %}selected{% endif %}>{{ habitacion.numero }}</option>
+                {% endfor %}
+            {% else %}
+                <option disabled>Sin habitaciones disponibles :/</option>
+            {% endif %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ reserva.fecha_inicio }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="fecha_fin" class="form-label">Fecha Fin</label>
+        <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ reserva.fecha_fin }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="estado" class="form-label">Estado</label>
+        <select name="estado" id="estado" class="form-control" required>
+            <option value="pendiente" {% if reserva.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+            <option value="confirmada" {% if reserva.estado == 'confirmada' %}selected{% endif %}>Confirmada</option>
+            <option value="cancelada" {% if reserva.estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="servicios" class="form-label">Servicios</label>
+        <select name="servicios" id="servicios" class="form-control" multiple required>
+            {% for servicio in servicios %}
+                <option value="{{ servicio.id }}" {% if servicio.id in detalles %}selected{% endif %}>{{ servicio.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Actualizar Reserva</button>
+</form>
+<a href="{{ url_for('reservas') }}" style="margin-bottom: 7px;" class="btn btn-secondary mt-3">Volver</a>
+{% endblock %}

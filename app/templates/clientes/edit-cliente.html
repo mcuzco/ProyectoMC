@@ -1,0 +1,15 @@
+<!-- Editar Cliente -->
+{% extends "layout.html" %}
+
+{% block body %}
+<h2>Editar Cliente</h2>
+<form action="{{ url_for('update_cliente', id=cliente.id) }}" method="post">
+    <input type="text" name="nombre" value="{{ cliente.nombre }}" placeholder="Nombre" required>
+    <input type="email" name="email" value="{{ cliente.email }}" placeholder="Email" required>
+    <input type="text" name="telefono" value="{{ cliente.telefono }}" placeholder="Teléfono" required>
+    <button type="submit">Actualizar Cliente</button>
+</form>
+<a href="{{ url_for('clientes') }}" style="margin-top: 7px;" class="btn btn-secondary btn-sm">
+    <i class="fas fa-arrow-left"></i> Volver
+</a>
+{% endblock %}
