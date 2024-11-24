@@ -1,7 +1,6 @@
-# drop database flaskcontact;
 -- Crear base de datos
-CREATE DATABASE flaskcontact4;
-USE flaskcontact4;
+CREATE DATABASE ProyectoMC;
+USE ProyectoMC;
 
 -- Tabla de Clientes
 CREATE TABLE clientes (

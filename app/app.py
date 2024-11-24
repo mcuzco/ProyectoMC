@@ -15,8 +15,8 @@ app.config['SECRET_KEY'] = '<key>'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '<password>'
-app.config['MYSQL_DB'] = 'flaskcontact'
+app.config['MYSQL_PASSWORD'] = '<your password>'
+app.config['MYSQL_DB'] = 'ProyectoMC'
 app.config['MYSQL_SSL_DISABLED'] = True  # Deshabilitar SSL
 
 mysqldb = MySQL(app)

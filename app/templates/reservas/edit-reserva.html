@@ -38,7 +38,11 @@
     </div>
     <div class="mb-3">
         <label for="estado" class="form-label">Estado</label>
-        <input type="text" class="form-control" id="estado" name="estado" value="{{ reserva.estado }}" required>
+        <select name="estado" id="estado" class="form-control" required>
+            <option value="pendiente" {% if reserva.estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+            <option value="confirmada" {% if reserva.estado == 'confirmada' %}selected{% endif %}>Confirmada</option>
+            <option value="cancelada" {% if reserva.estado == 'cancelada' %}selected{% endif %}>Cancelada</option>
+        </select>
     </div>
     <div class="mb-3">
         <label for="servicios" class="form-label">Servicios</label>
